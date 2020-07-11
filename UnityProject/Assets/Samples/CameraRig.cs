@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using NaveXR.Device;
+using NaveXR.InputDevices;
 
 namespace Assets.Samples
 {
@@ -13,7 +13,7 @@ namespace Assets.Samples
 
         private void Update()
         {
-            if(NaveXR.Device.XRDevice.isEnabled)
+            if(NaveXR.InputDevices.XRDevice.isEnabled)
             {
                 //当前VR模式生效
             }
@@ -26,7 +26,7 @@ namespace Assets.Samples
         [ContextMenu("TryLoadDevice")]
         public void TryLoadDevice()
         {
-            NaveXR.Device.XRDevice.TryLoadDrivers(10f);
+            NaveXR.InputDevices.XRDevice.TryLoadDrivers(10f);
         }
 
         private void OnApplicationQuit()

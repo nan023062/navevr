@@ -88,8 +88,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a5cf5141231ba44a99562fb1bff915c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raycastDistance: 5
-  displayDistance: 20
+  raycastDistance: 100
+  displayDistance: 100
   cullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &43935563573912599
 Transform:
   m_ObjectHideFlags: 0
@@ -559,12 +559,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a5cf5141231ba44a99562fb1bff915c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raycastDistance: 20
-  displayDistance: 20
+  raycastDistance: 100
+  displayDistance: 100
   cullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  inputType: 2
+  inputType: 0
 --- !u!1 &7271082519645117863
 GameObject:
   m_ObjectHideFlags: 0
