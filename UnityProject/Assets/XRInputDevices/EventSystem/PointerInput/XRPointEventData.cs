@@ -20,17 +20,21 @@ namespace NaveXR.InputDevices
 
         public Vector3 hitNormal;
 
+        [Range(0f,1f)] public float force;
+
+        public bool useFingerRaycast = false;
+
         public Camera raycastCamera;
 
-        public static PointerEventData.FramePressState StateForButton(bool pressed, bool released)
+        public static FramePressState StateForButton(bool pressed, bool released)
         {
             if (pressed && released)
-                return PointerEventData.FramePressState.PressedAndReleased;
+                return FramePressState.PressedAndReleased;
             if (pressed)
-                return PointerEventData.FramePressState.Pressed;
+                return FramePressState.Pressed;
             if (released)
-                return PointerEventData.FramePressState.Released;
-            return PointerEventData.FramePressState.NotChanged;
+                return FramePressState.Released;
+            return FramePressState.NotChanged;
         }
 
     }

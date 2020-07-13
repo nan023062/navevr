@@ -21,7 +21,7 @@ namespace NaveXR.InputDevices
             if (mTouched)
             {
                 device.TryGetFeatureValue(CommonUsages.primary2DAxis, out mVec2Value);
-                device.TryGetFeatureValue(CommonUsages.thumbTouch, out mFloatValue);
+                device.TryGetFeatureValue(CommonUsages.thumbTouch, out mKeyForce);
             }
 
             bool lastPressed = mPressed;

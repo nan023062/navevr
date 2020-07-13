@@ -56,11 +56,11 @@ namespace NaveXR.InputDevices
 
         #region Api
 
-        public static XRDeviceUsage headset { private set; get; }
+        internal static XRDeviceUsage headset { private set; get; }
 
-        public static XRDeviceUsage leftHand { private set; get; }
+        internal static XRDeviceUsage leftHand { private set; get; }
 
-        public static XRDeviceUsage rightHand { private set; get; }
+        internal static XRDeviceUsage rightHand { private set; get; }
 
         public static string deviceName { get { return UnityEngine.XR.XRDevice.model; } }
 

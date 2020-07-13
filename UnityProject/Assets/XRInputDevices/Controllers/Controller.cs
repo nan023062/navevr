@@ -78,10 +78,10 @@ namespace NaveXR.InputDevices
         public XRNodeState xRNodeState { get; private set; }
         public bool isTracked { get { return uniqueId > 0; } }
 
-        public void Connected(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
+        public void Connected(XRNodeState nodeState, InputDevice inputDevice)
         {
             uniqueId = nodeState.uniqueID;
-            UpdateInputDeviceAndXRNode(nodeState, inputDevice);
+            UpdateInputDeviceAndXRNode(ref nodeState, ref inputDevice);
             Debug.LogFormat("Connected Controller: nodeType={0},uniqueId={1},device-{2}!",
                 nodeType, uniqueId, inputDevice.name);
             OnConnected(nodeState, inputDevice);
@@ -95,7 +95,8 @@ namespace NaveXR.InputDevices
             OnDisconnected();
         }
 
-        public void UpdateInputDeviceAndXRNode(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
+        //使用ref關鍵字 防止數據拷貝
+        public void UpdateInputDeviceAndXRNode(ref XRNodeState nodeState, ref InputDevice inputDevice)
         {
             //更新位置
             SyncUpdateTransform(ref nodeState);

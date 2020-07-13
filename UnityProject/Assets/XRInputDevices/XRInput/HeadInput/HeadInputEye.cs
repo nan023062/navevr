@@ -11,9 +11,11 @@ namespace NaveXR.InputDevices
     {
         private Eyes mEyes;
         public Eyes eyes { get { return mEyes; } }
+
         public HeadInputEye():base(XRKeyCode.Eye)
         {
         }
+
         public override void UpdateState(UnityEngine.XR.InputDevice device)
         {
             device.TryGetFeatureValue(CommonUsages.eyesData, out mEyes);

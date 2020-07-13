@@ -170,13 +170,17 @@ namespace NaveXR.InputDevices
         private static void UpdateInputDeviceAndNodeStatess()
         {
             int length = controllers.Count;
+            int lengthOfNode = xRNodeStates.Count;
             for (int i = 0; i < length; i++){
                 var device = controllers[i];
-                foreach (var nodeState in xRNodeStates){
-                    if (nodeState.uniqueID == device.UniqueId){
+                for (int j = 0; j < lengthOfNode; j++)
+                {
+                    var nodeState = xRNodeStates[j];
+                    if (nodeState.uniqueID == device.UniqueId)
+                    {
                         XRDeviceUsage deviceUsage;
                         xRDeviceUsages.TryGetValue(nodeState.uniqueID, out deviceUsage);
-                        device.UpdateInputDeviceAndXRNode(nodeState, deviceUsage.InputDevice);
+                        device.UpdateInputDeviceAndXRNode(ref nodeState, ref deviceUsage.InputDevice);
                         break;
                     }
                 }

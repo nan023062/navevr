@@ -3,13 +3,14 @@ using System.Collections.Generic;
 
 namespace NaveXR.InputDevices
 {
-    public class XRDeviceUsage
+    internal class XRDeviceUsage
     {
-        public InputDevice InputDevice { private set; get; }
-        public XRNodeState nodeState { private set; get; }
+        public InputDevice InputDevice;
+        public XRNodeState nodeState;
         private XRDeviceUsage() { }
 
         private static List<XRDeviceUsage> __UsagePool = null;
+
         public static XRDeviceUsage Get(UnityEngine.XR.InputDevice inputDevice, XRNodeState xRNodeState)
         {
             if (__UsagePool == null) __UsagePool = new List<XRDeviceUsage>();

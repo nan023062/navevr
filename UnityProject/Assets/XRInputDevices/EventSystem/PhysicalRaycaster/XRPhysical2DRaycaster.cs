@@ -24,17 +24,39 @@ namespace NaveXR.InputDevices
         {
             //XR输入事件
             var xrPointData = eventData as XRPointEventData;
-            if (xrPointData != null)
-            {
+            if (xrPointData != null){
                 xrPointCamera = xrPointData.raycastCamera;
                 xrPointCamera.farClipPlane = xrPointData.hitDistance;
+                if (xrPointData.useFingerRaycast){
+                    Vector3 nearGraphicNormal = xrPointData.direction;
+                    if (FingerRaycast(xrPointData, ref nearGraphicNormal)){
+                        xrPointCamera.transform.LookAt(xrPointCamera.transform.position - nearGraphicNormal);
+                        base.Raycast(eventData, resultAppendList);
+                    }
+                }
+                else{
+                    base.Raycast(eventData, resultAppendList);
+                }
             }
             //原生输入事件
-            else
-            {
+            else{
                 xrPointCamera = null;
+                base.Raycast(eventData, resultAppendList);
             }
-            base.Raycast(eventData, resultAppendList);
+        }
+
+        /// <summary>
+        /// 手指检测最近的平面
+        /// 优化:
+        /// </summary>
+        private bool FingerRaycast(XRPointEventData eventData, ref Vector3 nearGrapicNormal)
+        {
+
+
+
+
+
+            return false;
         }
 
     }

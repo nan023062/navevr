@@ -25,5 +25,11 @@ namespace NaveXR.InputDevices
 
         //Eye
         Eye,
+
+        //Foot
+        Foot,
+
+        //Pevis
+        Pevis,
     }
 }

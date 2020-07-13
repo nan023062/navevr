@@ -22,7 +22,7 @@ namespace NaveXR.InputDevices
 
         private void Start()
         {
-            Input = XRDevice.GetHandInputButton<HandInputBase>(leftHand ? 0 : 1, keyCode);
+            Input = XRDevice.GetHandInputKey<HandInputBase>(leftHand ? 0 : 1, keyCode);
             start = new AnimaFrame();
             start.position = transform.localPosition;
             start.rotation = transform.localRotation;

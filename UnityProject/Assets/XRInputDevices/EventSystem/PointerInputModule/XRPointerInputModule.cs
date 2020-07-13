@@ -114,6 +114,7 @@ namespace NaveXR.InputDevices
             pointerData.raycastCamera = finger.raycastCamera;
             pointerData.position = new Vector2(finger.raycastCamera.pixelWidth * 0.5f, finger.raycastCamera.pixelHeight * 0.5f);
 
+            pointerData.useFingerRaycast = true;
             eventSystem.RaycastAll(pointerData, m_RaycastResultCache);
             var raycast = FindFirstRaycast(m_RaycastResultCache);
             pointerData.pointerCurrentRaycast = raycast;
@@ -123,6 +124,7 @@ namespace NaveXR.InputDevices
             finger.UpdateStateFormRaycast(ref raycast);
             pressed = created || (finger.phase == TouchPhase.Began);
             released = (finger.phase == TouchPhase.Canceled) || (finger.phase == TouchPhase.Ended);
+            pointerData.force = finger.force;
 
             if (finger.phase == TouchPhase.Canceled)
             {
@@ -143,6 +145,7 @@ namespace NaveXR.InputDevices
                 }
                 pointerData.hitNormal = raycast.worldNormal;
                 pointerData.hitPoint = raycast.worldPosition;
+                Debug.DrawRay(finger.origin, raycast.worldNormal);
             }
 
             return pointerData;
@@ -212,6 +215,7 @@ namespace NaveXR.InputDevices
             pointerData.position = new Vector2(laser.raycastCamera.pixelWidth * 0.5f, laser.raycastCamera.pixelHeight * 0.5f);
             mouseButtonData.buttonState = XRPointEventData.StateForButton(laser.isPressed, laser.isReleased);
 
+            pointerData.useFingerRaycast = false;
             eventSystem.RaycastAll(pointerData, m_RaycastResultCache);
             var raycast = FindFirstRaycast(m_RaycastResultCache);
             pointerData.pointerCurrentRaycast = raycast;

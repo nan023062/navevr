@@ -11,13 +11,16 @@ namespace NaveXR.InputDevices
         public override void UpdateState(UnityEngine.XR.InputDevice device)
         {
             bool lastPressed = mPressed;
-            device.TryGetFeatureValue(CommonUsages.gripButton, out mPressed);
+            float lastForce = mKeyForce;
 
+            device.TryGetFeatureValue(CommonUsages.grip, out mKeyForce);
+            mTouched = isTouched(mKeyForce);
+
+            //这里不使用UnityXR的按钮状态，因为会有感官上的延迟
+            //device.TryGetFeatureValue(CommonUsages.gripButton, out mPressed);
+            mPressed = OptimizPressByKeyForce(lastForce, mKeyForce, 0.0001f, 0.2f, 0.6f);
             mBoolDown = !lastPressed && mPressed;
             mBoolUp = lastPressed && !mPressed;
-
-            device.TryGetFeatureValue(CommonUsages.grip, out mFloatValue);
-            mTouched = isTouched(mFloatValue);
         }
     }
 }

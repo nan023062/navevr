@@ -28,6 +28,8 @@ namespace NaveXR.InputDevices
         {
             fingerId = s_fingerId++;
             base.Awake();
+
+            // 为适应Unity.EventSystem 事件逻辑，需要构建射线检测相机实例
             raycastCamera = GetComponent<Camera>();
             if (raycastCamera == null)
                 raycastCamera = gameObject.AddComponent<Camera>();
@@ -55,16 +57,19 @@ namespace NaveXR.InputDevices
 
         private void Update()
         {
+            //左手按鍵狀態
             if (inputType == InputType.LeftHand)
             {
-                isPressed = XRDevice.IsLeftButtonDown(XRKeyCode.Trigger);
-                isReleased = XRDevice.IsLeftButtonUp(XRKeyCode.Trigger);
+                isPressed = XRDevice.IsLeftKeyDown(XRKeyCode.Trigger);
+                isReleased = XRDevice.IsLeftKeyUp(XRKeyCode.Trigger);
             }
+            //右手按鍵狀態
             else if (inputType == InputType.RightHand)
             {
-                isPressed = XRDevice.IsRightButtonDown(XRKeyCode.Trigger);
-                isReleased = XRDevice.IsRightButtonUp(XRKeyCode.Trigger);
+                isPressed = XRDevice.IsRightKeyDown(XRKeyCode.Trigger);
+                isReleased = XRDevice.IsRightKeyUp(XRKeyCode.Trigger);
             }
+            //Unity原生模式狀態
             else if (inputType == InputType.Native)
             {
                 if(Input.touchSupported)

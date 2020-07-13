@@ -14,13 +14,11 @@ namespace NaveXR.InputDevices
         public override void UpdateState(UnityEngine.XR.InputDevice device)
         {
             device.TryGetFeatureValue(CommonUsages.primary2DAxisTouch, out mTouched);
-
-            mFloatValue = 0f;
+            mKeyForce = 0f;
             bool lastPressed = mPressed;
             mPressed = false;
 
-            if (mTouched)
-            {
+            if (mTouched){             
                 Vector2 axis = Vector2.zero;
                 device.TryGetFeatureValue(CommonUsages.primary2DAxis, out axis);
 
@@ -31,10 +29,14 @@ namespace NaveXR.InputDevices
                 else if(keyCode == XRKeyCode.TouchWest) mTouched = inWest(axis);
                 else if(keyCode == XRKeyCode.TouchEast) mTouched = inEast(axis);
 
-                if (mTouched)
-                {
-                    device.TryGetFeatureValue(CommonUsages.thumbTouch, out mFloatValue);
-                    mPressed = axis.sqrMagnitude >= touchPressSqr;
+                if (mTouched){
+                    if(keyCode == XRKeyCode.TouchMiddle){
+                        device.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out mPressed);
+                    }
+                    else{
+                        device.TryGetFeatureValue(CommonUsages.thumbTouch, out mKeyForce);
+                        mPressed = axis.sqrMagnitude >= touchPressSqr;
+                    }
                 }
             }
             mBoolDown = !lastPressed && mPressed;

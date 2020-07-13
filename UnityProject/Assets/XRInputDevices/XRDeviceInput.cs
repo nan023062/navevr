@@ -9,31 +9,30 @@ namespace NaveXR.InputDevices
 {
     public partial class XRDevice : MonoBehaviour
     {
-        Dictionary<XRKeyCode, HandInputBase[]> mXRHandInputs;
+        Dictionary<int, HandInputBase[]> mXRHandInputs;
 
         HeadInputEye headInputEye;
 
         private void InitlizeInputs()
         {
             if (mXRHandInputs == null) {
-                mXRHandInputs = new Dictionary<XRKeyCode, HandInputBase[]>()
+                mXRHandInputs = new Dictionary<int, HandInputBase[]>()
                 {
-                    [XRKeyCode.Menu] = new HandInputBase[2] { new HandMenu(), new HandMenu() },
-                    [XRKeyCode.Primary] = new HandInputBase[2] { new HandPrimary(), new HandPrimary() },
-                    [XRKeyCode.Secondary] = new HandInputBase[2] { new HandSecondary(), new HandSecondary() },
-                    [XRKeyCode.Trigger] = new HandInputBase[2] { new HandTrigger(), new HandTrigger() },
-                    [XRKeyCode.Grip] = new HandInputBase[2] { new HandGrip(), new HandGrip() },
-                    [XRKeyCode.TouchMiddle] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchMiddle), new HandTouchButton(XRKeyCode.TouchMiddle) },
-                    [XRKeyCode.TouchNorth] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchNorth), new HandTouchButton(XRKeyCode.TouchNorth) },
-                    [XRKeyCode.TouchWest] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchWest), new HandTouchButton(XRKeyCode.TouchWest) },
-                    [XRKeyCode.TouchEast] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchEast), new HandTouchButton(XRKeyCode.TouchEast) },
-                    [XRKeyCode.TouchSouth] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchSouth), new HandTouchButton(XRKeyCode.TouchSouth) },
-                    [XRKeyCode.TouchAxis] = new HandInputBase[2] { new HandTouchAxis(), new HandTouchAxis() },
-                    [XRKeyCode.HandPose] = new HandInputBase[2] { new HandInputPose(true), new HandInputPose(false) },
+                    [(int)XRKeyCode.Menu] = new HandInputBase[2] { new HandMenu(), new HandMenu() },
+                    [(int)XRKeyCode.Primary] = new HandInputBase[2] { new HandPrimary(), new HandPrimary() },
+                    [(int)XRKeyCode.Secondary] = new HandInputBase[2] { new HandSecondary(), new HandSecondary() },
+                    [(int)XRKeyCode.Trigger] = new HandInputBase[2] { new HandTrigger(), new HandTrigger() },
+                    [(int)XRKeyCode.Grip] = new HandInputBase[2] { new HandGrip(), new HandGrip() },
+                    [(int)XRKeyCode.TouchMiddle] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchMiddle), new HandTouchButton(XRKeyCode.TouchMiddle) },
+                    [(int)XRKeyCode.TouchNorth] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchNorth), new HandTouchButton(XRKeyCode.TouchNorth) },
+                    [(int)XRKeyCode.TouchWest] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchWest), new HandTouchButton(XRKeyCode.TouchWest) },
+                    [(int)XRKeyCode.TouchEast] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchEast), new HandTouchButton(XRKeyCode.TouchEast) },
+                    [(int)XRKeyCode.TouchSouth] = new HandInputBase[2] { new HandTouchButton(XRKeyCode.TouchSouth), new HandTouchButton(XRKeyCode.TouchSouth) },
+                    [(int)XRKeyCode.TouchAxis] = new HandInputBase[2] { new HandTouchAxis(), new HandTouchAxis() },
+                    [(int)XRKeyCode.HandPose] = new HandInputBase[2] { new HandInputPose(true), new HandInputPose(false) },
                 };
             }
             if (headInputEye == null) headInputEye = new HeadInputEye();
-
         }
 
         private void UpdateInputStates()
@@ -48,95 +47,95 @@ namespace NaveXR.InputDevices
             if (headset != null) headInputEye.UpdateState(headset.InputDevice);
         }
 
-        public static T GetHandInputButton<T>(int hand, XRKeyCode keyCode) where T : HandInputBase
+        public static T GetHandInputKey<T>(int hand, XRKeyCode keyCode) where T : HandInputBase
         {
             CheckSingleton();
             if (_instance == null) return null;
             _instance.InitlizeInputs();
             hand = Math.Max(0, Math.Min(1, hand));
-            return _instance.mXRHandInputs[keyCode][hand] as T;
+            return _instance.mXRHandInputs[(int)keyCode][hand] as T;
         }
 
         #region API
 
-        public static float GetButtonValue(int hand, XRKeyCode keyCode)
+        public static float GetKeyForce(int hand, XRKeyCode keyCode)
         {
-            var button = GetHandInputButton<HandInputBase>(hand, keyCode);
-            return button.Value;
+            var key = GetHandInputKey<HandInputBase>(hand, keyCode);
+            return key.Force;
         }
 
-        public static bool IsButtonTouched(int hand, XRKeyCode keyCode)
+        public static bool IsKeyTouched(int hand, XRKeyCode keyCode)
         {
-            var button = GetHandInputButton<HandInputBase>(hand, keyCode);
-            return button.Touched;
+            var key = GetHandInputKey<HandInputBase>(hand, keyCode);
+            return key.Touched;
         }
 
-        public static bool IsButtonPressed(int hand, XRKeyCode keyCode)
+        public static bool IsKeyPressed(int hand, XRKeyCode keyCode)
         {
-            var button = GetHandInputButton<HandInputBase>(hand, keyCode);
-            return button.Pressed;
+            var key = GetHandInputKey<HandInputBase>(hand, keyCode);
+            return key.Pressed;
         }
 
-        public static bool IsButtonDown(int hand, XRKeyCode keyCode)
+        public static bool IsKeyDown(int hand, XRKeyCode keyCode)
         {
-            var button = GetHandInputButton<HandInputBase>(hand, keyCode);
-            return button.KeyDown;
+            var key = GetHandInputKey<HandInputBase>(hand, keyCode);
+            return key.KeyDown;
         }
 
-        public static bool IsButtonUp(int hand, XRKeyCode keyCode)
+        public static bool IsKeyUp(int hand, XRKeyCode keyCode)
         {
-            var button = GetHandInputButton<HandInputBase>(hand, keyCode);
-            return button.KeyUp;
+            var key = GetHandInputKey<HandInputBase>(hand, keyCode);
+            return key.KeyUp;
         }
 
-        public static float GetLeftButtonValue(XRKeyCode keyCode)
+        public static float GetLeftKeyForce(XRKeyCode keyCode)
         {
-            return GetButtonValue(0, keyCode);
+            return GetKeyForce(0, keyCode);
         }
 
-        public static bool IsLeftButtonTouched(XRKeyCode keyCode)
+        public static bool IsLeftKeyTouched(XRKeyCode keyCode)
         {
-            return IsButtonTouched(0, keyCode);
+            return IsKeyTouched(0, keyCode);
         }
 
-        public static bool IsLeftButtonPressed(XRKeyCode keyCode)
+        public static bool IsLeftKeyPressed(XRKeyCode keyCode)
         {
-            return IsButtonPressed(0, keyCode);
+            return IsKeyPressed(0, keyCode);
         }
 
-        public static bool IsLeftButtonDown(XRKeyCode keyCode)
+        public static bool IsLeftKeyDown(XRKeyCode keyCode)
         {
-            return IsButtonDown(0, keyCode);
+            return IsKeyDown(0, keyCode);
         }
 
-        public static bool IsLeftButtonUp(XRKeyCode keyCode)
+        public static bool IsLeftKeyUp(XRKeyCode keyCode)
         {
-            return IsButtonUp(0, keyCode);
+            return IsKeyUp(0, keyCode);
         }
 
-        public static float GetRightButtonValue(XRKeyCode keyCode)
+        public static float GetRightKeyForce(XRKeyCode keyCode)
         {
-            return GetButtonValue(1, keyCode);
+            return GetKeyForce(1, keyCode);
         }
 
-        public static bool IsRightButtonTouched(XRKeyCode keyCode)
+        public static bool IsRightKeyTouched(XRKeyCode keyCode)
         {
-            return IsButtonTouched(1, keyCode);
+            return IsKeyTouched(1, keyCode);
         }
 
-        public static bool IsRightButtonPressed(XRKeyCode keyCode)
+        public static bool IsRightKeyPressed(XRKeyCode keyCode)
         {
-            return IsButtonPressed(1, keyCode);
+            return IsKeyPressed(1, keyCode);
         }
 
-        public static bool IsRightButtonDown(XRKeyCode keyCode)
+        public static bool IsRightKeyDown(XRKeyCode keyCode)
         {
-            return IsButtonDown(1, keyCode);
+            return IsKeyDown(1, keyCode);
         }
 
-        public static bool IsRightButtonUp(XRKeyCode keyCode)
+        public static bool IsRightKeyUp(XRKeyCode keyCode)
         {
-            return IsButtonUp(1, keyCode);
+            return IsKeyUp(1, keyCode);
         }
 
         #endregion

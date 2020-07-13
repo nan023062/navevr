@@ -128,11 +128,11 @@ namespace NaveXR.InputDevices
         private void AdjustTransform()
         {
             if (referenceHandle == null || model == null) return;
-            if(XRDevice.IsButtonDown(Left?0:1,XRKeyCode.Trigger))
+            if(XRDevice.IsKeyDown(Left?0:1,XRKeyCode.Trigger))
             {
                 SetTargetOffset(model.transform, referenceHandle.transform);
             }
-            if (XRDevice.IsButtonDown(Left ? 0 : 1, XRKeyCode.Secondary))
+            if (XRDevice.IsKeyDown(Left ? 0 : 1, XRKeyCode.Secondary))
             {
                 SetTargetOffset(Vector3.zero, Quaternion.identity);
             }

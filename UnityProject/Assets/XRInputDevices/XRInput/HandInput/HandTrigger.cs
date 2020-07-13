@@ -11,23 +11,17 @@ namespace NaveXR.InputDevices
 
         public override void UpdateState(UnityEngine.XR.InputDevice device)
         {
-            device.TryGetFeatureValue(CommonUsages.trigger, out mFloatValue);
-            mTouched = isTouched(mFloatValue);
-
             bool lastPressed = mPressed;
+            float lastForce = mKeyForce;
 
-            //Oculus 驱动时 triggerButton不是真的点击效果，所以使用Touched来判断
-            if (XRDevice.Driver == XRDVName.Oculus)
-            {
-                mPressed = mFloatValue > 0.88F;
-            }
-            else if (XRDevice.Driver == XRDVName.OpenVR)
-            {
-                device.TryGetFeatureValue(CommonUsages.triggerButton, out mPressed);
-            }
+            device.TryGetFeatureValue(CommonUsages.trigger, out mKeyForce);
+            mTouched = isTouched(mKeyForce);
+
+            //这里不使用UnityXR的按钮状态，因为会有感官上的延迟
+            //device.TryGetFeatureValue(CommonUsages.triggerButton, out mPressed);
+            mPressed = OptimizPressByKeyForce(lastForce, mKeyForce, 0.0001f, 0.2f, 0.6f);
             mBoolDown = !lastPressed && mPressed;
             mBoolUp = lastPressed && !mPressed;
-
         }
     }
 }

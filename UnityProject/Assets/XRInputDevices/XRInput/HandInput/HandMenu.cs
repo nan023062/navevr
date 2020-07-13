@@ -17,10 +17,9 @@ namespace NaveXR.InputDevices
             mBoolDown = !lastPressed && mPressed;
             mBoolUp = lastPressed && !mPressed;
 
-            mFloatValue = 0f;
-            if (mPressed) device.TryGetFeatureValue(CommonUsages.thumbTouch, out mFloatValue);
-
-            mTouched = isTouched(mFloatValue);
+            mKeyForce = 0f;
+            if (mPressed) device.TryGetFeatureValue(CommonUsages.thumbTouch, out mKeyForce);
+            mTouched = isTouched(mKeyForce);
         }
     }
 }
