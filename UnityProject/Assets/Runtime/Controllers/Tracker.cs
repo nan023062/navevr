@@ -6,37 +6,17 @@ namespace NaveXR.InputDevices
 {
     public class Tracker : Controller
     {
-        protected override void OnAfterCreate()
-        {
-            nodeType = XRNode.HardwareTracker;
-        }
-
-        protected override void OnBeforeDestroy()
+        internal override void SetVisiable(bool visiable)
         {
 
         }
 
-        protected override void OnConnected(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
+        internal override void OnConnected(XRNodeState nodeState, InputDevice inputDevice)
         {
 
         }
 
-        protected override void OnDisconnected()
-        {
-
-        }
-
-        protected override void OnUpdate()
-        {
-
-        }
-
-        protected override void OnUpdateInputDevice(ref UnityEngine.XR.InputDevice inputDevice)
-        {
-
-        }
-
-        protected override void OnUpdateTransform(ref XRNodeState nodeState)
+        internal override void OnDisconnected()
         {
 
         }

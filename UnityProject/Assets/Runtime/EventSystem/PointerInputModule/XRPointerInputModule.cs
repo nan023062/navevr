@@ -145,7 +145,7 @@ namespace NaveXR.InputDevices
                 }
                 pointerData.hitNormal = raycast.worldNormal;
                 pointerData.hitPoint = raycast.worldPosition;
-                Debug.DrawRay(finger.origin, raycast.worldNormal);
+                //Debug.DrawRay(finger.origin, raycast.worldNormal);
             }
 
             return pointerData;

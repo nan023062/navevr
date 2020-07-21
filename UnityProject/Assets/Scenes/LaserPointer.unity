@@ -1989,6 +1989,9 @@ MonoBehaviour:
   cullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  force: 0
+  velocity: {x: 0, y: 0, z: 0}
+  acceleration: {x: 0, y: 0, z: 0}
 --- !u!20 &686427073
 Camera:
   m_ObjectHideFlags: 0
@@ -6903,9 +6906,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1304802336, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
-    - {fileID: 2064992355407626759, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
+    - target: {fileID: 1104068854, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
+      propertyPath: updateTransform
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 932599976, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
+      propertyPath: updateTransform
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
 --- !u!1 &1894401869
 GameObject:

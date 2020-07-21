@@ -14,7 +14,14 @@ namespace NaveXR.InputDevices
         public readonly static string Oculus = "Oculus";
     }
 
+    public delegate void XRDeviceDelegate(XRNodeState xRNodeState, InputDevice inputDevice);
 
+    /// <summary>
+    /// 单利XR设备及输入管理器
+    /// 1 负责管理设备实例
+    /// 2 负责更新设备KeyCode的状态
+    /// 3 负责XR设备兼容适配
+    /// </summary>
     public partial class XRDevice : MonoBehaviour
     {
         private static Coroutine co;
@@ -54,8 +61,6 @@ namespace NaveXR.InputDevices
             co = null;
         }
 
-        #region Api
-
         internal static XRDeviceUsage headset { private set; get; }
 
         internal static XRDeviceUsage leftHand { private set; get; }
@@ -64,7 +69,13 @@ namespace NaveXR.InputDevices
 
         public static string deviceName { get { return UnityEngine.XR.XRDevice.model; } }
 
-        #endregion
+        public static bool isTouchPad { private set; get; } = false;
+
+        private static void checkTouchPad()
+        {
+            string device = deviceName.ToLower();
+            isTouchPad = device.Contains("vive") || device.Contains("wmr");
+        }
 
         #region Main
 
@@ -84,15 +95,16 @@ namespace NaveXR.InputDevices
         {
             Debug.Assert(_instance == null, GetType().FullName + ": 单例类被多次实例化！");
             _instance = this;
+            gameObject.hideFlags = HideFlags.NotEditable | HideFlags.DontSave;
             InitlizeInputs();
         }
 
         private void OnEnable()
         {
             UnityEngine.XR.XRDevice.SetTrackingSpaceType(TrackingSpaceType.RoomScale);
-
             UnityEngine.XR.XRDevice.deviceLoaded -= XRDevice_deviceLoaded;
             UnityEngine.XR.XRDevice.deviceLoaded += XRDevice_deviceLoaded;
+            checkTouchPad();
 
             //UnityEngine.XR.InputTracking.trackingLost -= InputTracking_trackingLost;
             //UnityEngine.XR.InputTracking.trackingLost += InputTracking_trackingLost;

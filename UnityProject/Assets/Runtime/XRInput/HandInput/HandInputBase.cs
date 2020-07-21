@@ -51,10 +51,10 @@
             float subThreshold, float addThreshold, float forceThreshold)
         {
             //当按键力在变小或小于阈值，认为是抬起了按键
-            if (lastForce < currForce - subThreshold || currForce < forceThreshold)
+            if (currForce < lastForce - subThreshold || currForce < forceThreshold)
                 return false;
             //当按键力在变大或大于阈值，认为是按下了按键
-            else if (lastForce > currForce + addThreshold || currForce >= forceThreshold)
+            else if (currForce > lastForce + addThreshold || currForce >= forceThreshold)
                 return true;
             return false;
         }

@@ -5,13 +5,14 @@ namespace NaveXR.InputDevices
 {
     internal class XRDeviceUsage
     {
-        public InputDevice InputDevice;
-        public XRNodeState nodeState;
+        internal bool isTracked = false;
+        internal InputDevice InputDevice;
+        internal XRNodeState nodeState;
         private XRDeviceUsage() { }
 
         private static List<XRDeviceUsage> __UsagePool = null;
 
-        public static XRDeviceUsage Get(UnityEngine.XR.InputDevice inputDevice, XRNodeState xRNodeState)
+        internal static XRDeviceUsage Get(UnityEngine.XR.InputDevice inputDevice, XRNodeState xRNodeState)
         {
             if (__UsagePool == null) __UsagePool = new List<XRDeviceUsage>();
 
@@ -27,9 +28,10 @@ namespace NaveXR.InputDevices
             }
             usage.InputDevice = inputDevice;
             usage.nodeState = xRNodeState;
+            usage.isTracked = false;
             return usage;
         }
-        public static void Put(XRDeviceUsage usage)
+        internal static void Put(XRDeviceUsage usage)
         {
             __UsagePool.Add(usage);
         }

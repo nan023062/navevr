@@ -30,11 +30,10 @@ namespace NaveXR.InputDevices
                 else if(keyCode == XRKeyCode.TouchEast) mTouched = inEast(axis);
 
                 if (mTouched){
-                    if(keyCode == XRKeyCode.TouchMiddle){
+                    if (keyCode == XRKeyCode.TouchMiddle || XRDevice.isTouchPad){
                         device.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out mPressed);
                     }
                     else{
-                        device.TryGetFeatureValue(CommonUsages.thumbTouch, out mKeyForce);
                         mPressed = axis.sqrMagnitude >= touchPressSqr;
                     }
                 }

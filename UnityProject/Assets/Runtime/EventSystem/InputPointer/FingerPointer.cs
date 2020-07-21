@@ -52,7 +52,7 @@ namespace NaveXR.InputDevices
                 var go= new GameObject("RaycastCamera", typeof(Camera));
                 go.transform.SetParent(transform);
                 raycastCamera = go.GetComponent<Camera>();
-                //go.hideFlags = HideFlags.NotEditable | HideFlags.HideInInspector;
+                go.hideFlags = HideFlags.NotEditable | HideFlags.HideInInspector;
             }
 
             float dis = safeDistance / Mathf.Max(0.00001f, transform.lossyScale.z);

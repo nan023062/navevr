@@ -8,46 +8,18 @@ namespace NaveXR.InputDevices
 {
     public class Handle : Controller
     {
-        [Header(" Witch Handle ")]
-        [SerializeField] private bool Left = true;
-
-        protected override void OnAfterCreate()
+        internal override void SetVisiable(bool visiable)
         {
-            nodeType = Left ? XRNode.LeftHand : XRNode.RightHand;
-
-            //OpenVR
-            SetTargetOffset(new Vector3(Left?- 0.003f:0.003f, -0.006f, -0.1f), Quaternion.identity);
-
-            //Oculus
-            //SetTargetOffset(Vector3.zero, Quaternion.Euler(-40f, 0, 0));
+           
         }
 
-        protected override void OnBeforeDestroy()
-        {
-        }
-
-        protected override void OnConnected(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
+        internal override void OnConnected(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
         {
             //检测手柄模型是够匹配
-            TryMathchDeviceModel(nodeState, inputDevice);
+            MathchDeviceModel(nodeState, inputDevice);
         }
 
-        protected override void OnDisconnected()
-        {
-        }
-
-        protected override void OnUpdate()
-        {
-#if UNITY_EDITOR
-            AdjustTransform();
-#endif
-        }
-
-        protected override void OnUpdateInputDevice(ref UnityEngine.XR.InputDevice inputDevice)
-        {
-        }
-
-        protected override void OnUpdateTransform(ref XRNodeState nodeState)
+        internal override void OnDisconnected()
         {
         }
 
@@ -57,48 +29,26 @@ namespace NaveXR.InputDevices
         private GameObject model;
         private HandShankModel handShankModel;
         private Renderer[] renderers = null;
-        private Dictionary<string, string> deviceToRes = new Dictionary<string, string>()
+
+        private void MathchDeviceModel(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
         {
-            {"Default","handShankModel/Prefab/Oculus_rifts_Controller"},
-            {"Oculus Rift S","handShankModel/Prefab/Oculus_rifts_Controller"},
-            {"oculus_cv1","handShankModel/Prefab/Oculus_cv1_Controller"},
-            {"vive","handShankModel/Prefab/HTC_Controller"},
-        };
+            return;
+            //if (model == null || model.name != XRDevice.deviceName)
+            //{
+            //    GameObject go = LoadAndInitModel(nodeState.nodeType == XRNode.LeftHand);
+            //    if (model != null) GameObject.DestroyImmediate(model);
+            //    model = GameObject.Instantiate(go);
+            //    model.transform.SetParent(transform);
+            //    model.transform.localPosition = Vector3.zero;
+            //    model.transform.localRotation = Quaternion.identity;
+            //    model.transform.localScale = Vector3.one;
+            //    model.name = XRDevice.deviceName;
+            //    handShankModel = model.GetComponent<HandShankModel>();
 
-        private void TryMathchDeviceModel(XRNodeState nodeState, UnityEngine.XR.InputDevice inputDevice)
-        {
-            string deviceName = XRDevice.deviceName;
-            string handModelRes = deviceToRes["Default"];
-            if (!deviceToRes.TryGetValue(deviceName, out handModelRes))
-            {
-                Debug.LogErrorFormat("没匹配成功指定设备名称！{0}", XRDevice.deviceName);
-                return;
-            }
-            if (model == null || model.name != handModelRes)
-            {
-                if (model != null) GameObject.DestroyImmediate(model);
-                string model_res = handModelRes + (Left ? "_Left" : "_Right");
-                var go = Resources.Load<GameObject>(model_res);
-                if(go == null)
-                {
-                    Debug.LogErrorFormat("没找到指定设备的模型资源！{0}", model_res);
-                    return;
-                }
-                model = GameObject.Instantiate(go);
-                model.transform.SetParent(transform);
-                model.transform.localPosition = Vector3.zero;
-                model.transform.localRotation = Quaternion.identity;
-                model.transform.localScale = Vector3.one;
-                model.name = XRDevice.deviceName;
-                handShankModel = model.GetComponent<HandShankModel>();
-
-                //模型初始化
-                renderers = model.GetComponentsInChildren<Renderer>(true);
-                animator = model.GetComponentInChildren<Animator>();
-
-
-
-            }
+            //    //模型初始化
+            //    renderers = model.GetComponentsInChildren<Renderer>(true);
+            //    animator = model.GetComponentInChildren<Animator>();
+            //}
         }
 
         #endregion
@@ -118,27 +68,31 @@ namespace NaveXR.InputDevices
 
         #endregion
 
-        #region Editor Controller Adjust Transform
+        #region 模型资源加载--当前项目逻辑
 
-#if UNITY_EDITOR
-
-        [Header("Editor Controller Adjust Transform ")]
-        public GameObject referenceHandle;
-
-        private void AdjustTransform()
+        private Dictionary<string, string> deviceToRes = new Dictionary<string, string>()
         {
-            if (referenceHandle == null || model == null) return;
-            if(XRDevice.IsKeyDown(Left?0:1,XRKeyCode.Trigger))
-            {
-                SetTargetOffset(model.transform, referenceHandle.transform);
-            }
-            if (XRDevice.IsKeyDown(Left ? 0 : 1, XRKeyCode.Secondary))
-            {
-                SetTargetOffset(Vector3.zero, Quaternion.identity);
-            }
-        }
+            {"Default","VRHandles/oculus_rifts"},
+            {"Oculus Rift S","VRHandles/oculus_rifts"},
+            {"oculus_cv1","VRHandles/oculus_cv1"},
+            {"vive","VRHandles/htc_controller"},
+        };
 
-#endif
+        //private GameObject LoadAndInitModel(bool left)
+        //{
+        //    string bundleName = deviceToRes["Default"];
+        //    if (!deviceToRes.TryGetValue(XRDevice.deviceName, out bundleName))
+        //        Debug.LogWarningFormat("没匹配成功指定设备名称！{0}", XRDevice.deviceName);
+
+        //    string assetName = left ? "Left" : "Right";
+        //    //var asset = OasisAsset.Task(bundleName, assetName).Method(ZFrame.Asset.LoadMethod.Forever).Sync<GameObject>();
+        //    if (asset == null)
+        //    {
+        //        Debug.LogErrorFormat("没找到指定设备的模型资源！{0}", bundleName);
+        //        return null;
+        //    }
+        //    return asset;
+        //}
 
         #endregion
     }

@@ -47,7 +47,7 @@ namespace NaveXR.InputDevices
             if (headset != null) headInputEye.UpdateState(headset.InputDevice);
         }
 
-        public static T GetHandInputKey<T>(int hand, XRKeyCode keyCode) where T : HandInputBase
+        internal static T GetHandInputKey<T>(int hand, XRKeyCode keyCode) where T : HandInputBase
         {
             CheckSingleton();
             if (_instance == null) return null;
@@ -138,6 +138,12 @@ namespace NaveXR.InputDevices
             return IsKeyUp(1, keyCode);
         }
 
+        public static Vector2 GetTouchAxis(int hand)
+        {
+            var touchInput = GetHandInputKey<HandTouchAxis>(hand, XRKeyCode.TouchAxis);
+            return touchInput.Value2D;
+        }
+
         #endregion
 
         #region Input Points
@@ -146,33 +152,33 @@ namespace NaveXR.InputDevices
 
         private static List<FingerPointer> m_fingerPointers;
 
-        public static void Regist(LaserPointer laser)
+        internal static void Regist(LaserPointer laser)
         {
             GetLasers().Add(laser);
         }
 
-        public static void Remove(LaserPointer laser)
+        internal static void Remove(LaserPointer laser)
         {
             GetLasers()?.Remove(laser);
         }
 
-        public static void Regist(FingerPointer finger)
+        internal static void Regist(FingerPointer finger)
         {
             GetFingers().Add(finger);
         }
 
-        public static void Remove(FingerPointer finger)
+        internal static void Remove(FingerPointer finger)
         {
             GetFingers()?.Remove(finger);
         }
 
-        public static List<FingerPointer> GetFingers()
+        internal static List<FingerPointer> GetFingers()
         {
             if (m_fingerPointers == null) m_fingerPointers = new List<FingerPointer>();
             return m_fingerPointers;
         }
 
-        public static List<LaserPointer> GetLasers()
+        internal static List<LaserPointer> GetLasers()
         {
             if (m_laserPointers == null) m_laserPointers = new List<LaserPointer>();
             return m_laserPointers;
@@ -181,37 +187,37 @@ namespace NaveXR.InputDevices
         #endregion
 
         #region TestXRInputUsages
-
+        
 #if UNITY_EDITOR
 
         [Header("Bool")]
-        public bool isTracked;
-        public bool primaryButton;
-        public bool primaryTouch;
-        public bool secondaryButton;
-        public bool secondaryTouch;
-        public bool gripButton;
-        public bool triggerButton;
-        public bool menuButton;
-        public bool primary2DAxisClick;
-        public bool primary2DAxisTouch;
-        public bool thumbrest;
+        [SerializeField] private bool isTracked;
+        [SerializeField] private bool primaryButton;
+        [SerializeField] private bool primaryTouch;
+        [SerializeField] private bool secondaryButton;
+        [SerializeField] private bool secondaryTouch;
+        [SerializeField] private bool gripButton;
+        [SerializeField] private bool triggerButton;
+        [SerializeField] private bool menuButton;
+        [SerializeField] private bool primary2DAxisClick;
+        [SerializeField] private bool primary2DAxisTouch;
+        [SerializeField] private bool thumbrest;
 
         [Header("Float")]
-        public float indexTouch;
-        public float thumbTouch;
-        public float batteryLevel;
-        public float trigger;
-        public float grip;
-        public float indexFinger;
-        public float middleFinger;
-        public float ringFinger;
-        public float pinkyFinger;
+        [SerializeField] private float indexTouch;
+        [SerializeField] private float thumbTouch;
+        [SerializeField] private float batteryLevel;
+        [SerializeField] private float trigger;
+        [SerializeField] private float grip;
+        [SerializeField] private float indexFinger;
+        [SerializeField] private float middleFinger;
+        [SerializeField] private float ringFinger;
+        [SerializeField] private float pinkyFinger;
 
         [Header("Vector2")]
-        public Vector2 primary2DAxis;
-        public Vector2 dPad;
-        public Vector2 secondary2DAxis;
+        [SerializeField] private Vector2 primary2DAxis;
+        [SerializeField] private Vector2 dPad;
+        [SerializeField] private Vector2 secondary2DAxis;
 
         private void TestXRInputUsages()
         {        
@@ -248,6 +254,7 @@ namespace NaveXR.InputDevices
             trigger.TryGetFeatureValue(CommonUsages.thumbrest, out thumbrest);
         }
 #endif
+        
         #endregion
     }
 }

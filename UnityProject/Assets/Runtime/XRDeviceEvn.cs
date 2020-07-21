@@ -10,13 +10,28 @@ namespace NaveXR.InputDevices
     {
         static Dictionary<ulong,XRDeviceUsage> xRDeviceUsages = new Dictionary<ulong, XRDeviceUsage>();
 
-        static List<Controller> controllers = new List<Controller>();
+        static List<DeviceCapture> captures = new List<DeviceCapture>();
+
+        public static DeviceCapture GeDeviceCapture(XRNode nodeType)
+        {
+            if (captures != null && captures.Count > 0){
+                for (int i = 0; i < captures.Count; i++){
+                    if(captures[i].isTracked && captures[i].NodeType == nodeType){
+                        return captures[i];
+                    }
+                }
+            }
+            return null;
+        }
 
         static List<XRNodeState> xRNodeStates = new List<XRNodeState>();
-
         static List<XRNodeState> newXRNodeStates = new List<XRNodeState>();
 
-        private bool SameNodeState(XRNodeState nodeState1, XRNodeState nodeState2)
+        public static event XRDeviceDelegate onDeviceConnected;
+
+        public static event XRDeviceDelegate onDeviceDisconnected;
+
+        private bool SameNodeState(ref XRNodeState nodeState1, ref XRNodeState nodeState2)
         {
             return (nodeState1.uniqueID == nodeState2.uniqueID
                 && nodeState1.nodeType == nodeState2.nodeType);
@@ -40,7 +55,7 @@ namespace NaveXR.InputDevices
                 for (int j = 0; j < lengthOfNew; j++)
                 {
                     var newNodeState = newXRNodeStates[j];
-                    if (SameNodeState(nodeState, newNodeState))
+                    if (SameNodeState(ref nodeState, ref newNodeState))
                     {
                         removed = false;
                         break;
@@ -61,7 +76,7 @@ namespace NaveXR.InputDevices
                 for (int j = 0; j < lengthOfOld; j++)
                 {
                     var nodeState = xRNodeStates[j];
-                    if (SameNodeState(nodeState, newNodeState))
+                    if (SameNodeState(ref nodeState, ref newNodeState))
                     {
                         added = false;
                         break;
@@ -81,6 +96,7 @@ namespace NaveXR.InputDevices
         {
             if (!XRSettings.enabled) XRSettings.enabled = true;
             Debug.LogFormat(" XRDevice_onDeviceLoaded() :: deviceName = {0}, mode = {1} , isDeviceActive = {2}!!", deviceName, UnityEngine.XR.XRDevice.model, XRSettings.isDeviceActive);
+            checkTouchPad();
         }
 
         private void InputTracking_nodeAdded(XRNodeState xRNode)
@@ -92,17 +108,19 @@ namespace NaveXR.InputDevices
                 XRDeviceUsage usage = XRDeviceUsage.Get(inputDevice, xRNode);
                 xRDeviceUsages.Add(xRNode.uniqueID, usage);
 
-                if(xRNode.nodeType == XRNode.Head) headset = usage;
+                if (xRNode.nodeType == XRNode.Head) headset = usage;
                 else if (xRNode.nodeType == XRNode.LeftHand) leftHand = usage;
                 else if (xRNode.nodeType == XRNode.RightHand) rightHand = usage;
 
-                Debug.LogFormat("XRDevice.InputTracking_nodeAdded... [nodeType={0}]", xRNode.nodeType);
+                //Debug.LogFormat("1111 XRDevice.onDeviceConnected... [nodeType={0}，name={1}]", xRNode.nodeType, inputDevice.name);
+                onDeviceConnected?.Invoke(xRNode, inputDevice);
 
                 //查找未匹配的设备列表
-                var devices = controllers.Where((d) => !d.isTracked && d.NodeType == xRNode.nodeType);
+                var devices = captures.Where((d) => !d.isTracked && d.NodeType == xRNode.nodeType);
                 if (devices != null && devices.Count()>0){
                     foreach (var device in devices){
-                        device.Connected(xRNode,inputDevice);
+                        usage.isTracked = true;
+                        device.Connected(ref xRNode,ref inputDevice);
                     }
                 }
             }
@@ -116,17 +134,20 @@ namespace NaveXR.InputDevices
                 XRDeviceUsage deviceUsage;
                 if(xRDeviceUsages.TryGetValue(xRNode.uniqueID, out deviceUsage))
                 {
+                    InputDevice inputDevice = deviceUsage.InputDevice;
                     xRDeviceUsages.Remove(xRNode.uniqueID);
+                    deviceUsage.isTracked = false;
                     XRDeviceUsage.Put(deviceUsage);
 
                     if (xRNode.nodeType == XRNode.Head) headset = null;
                     else if (xRNode.nodeType == XRNode.LeftHand) leftHand = null;
                     else if (xRNode.nodeType == XRNode.RightHand) rightHand = null;
 
-                    Debug.LogFormat("XRDevice.InputTracking_nodeRemoved... [nodeType={0}", xRNode.nodeType);
+                    onDeviceDisconnected?.Invoke(xRNode, inputDevice);
+                    //Debug.LogFormat("2222 XRDevice.onDeviceDisconnected... [nodeType={0}，name={1}]", xRNode.nodeType, inputDevice.name);
 
                     //查找已匹配的设备列表
-                    var devices = controllers.Where((d) => d.isTracked && d.NodeType == xRNode.nodeType);
+                    var devices = captures.Where((d) => d.isTracked && d.NodeType == xRNode.nodeType);
                     if (devices != null && devices.Count() > 0){
                         foreach (var device in devices){
                             device.Disconnected();
@@ -146,33 +167,39 @@ namespace NaveXR.InputDevices
             Debug.LogFormat("XRDevice.InputTracking_trackingLost... [nodeType={0},tracked={1}]", xRNode.nodeType, xRNode.tracked);
         }
 
-        public static void RegistDeviceCapture(Controller controller)
+        internal static void RegistDevice(DeviceCapture controller)
         {
-            controllers.Add(controller);
+            captures.Add(controller);
 
             //查找已匹配的设备列表
-            var usages = xRDeviceUsages.Values.Where((d) => d.nodeState.nodeType == controller.NodeType);
-            if (usages != null && usages.Count() > 0)
-            {
-                foreach (var usage in usages)
-                {
-                    controller.Connected(usage.nodeState,controller.inputDevice);
+            var usages = xRDeviceUsages.Values.Where((d) => !d.isTracked && d.nodeState.nodeType == controller.NodeType);
+            if (usages != null && usages.Count() > 0){
+                foreach (var usage in usages){
+                    usage.isTracked = true;
+                    controller.Connected(ref usage.nodeState, ref usage.InputDevice);
                     return;
                 }
             }
         }
 
-        public static void UnregistDeviceCapture(Controller controller)
+        internal static void UnregistDevice(DeviceCapture controller)
         {
-            controllers.Remove(controller);
+            XRDeviceUsage deviceUsage;
+            if (xRDeviceUsages.TryGetValue(controller.UniqueId, out deviceUsage)){
+                deviceUsage.isTracked = false;
+            }
+            captures.Remove(controller);
+            controller.Disconnected();
         }
 
         private static void UpdateInputDeviceAndNodeStatess()
         {
-            int length = controllers.Count;
+            int length = captures.Count;
             int lengthOfNode = xRNodeStates.Count;
             for (int i = 0; i < length; i++){
-                var device = controllers[i];
+                var device = captures[i];
+                if (!device.isActiveAndEnabled) continue;
+
                 for (int j = 0; j < lengthOfNode; j++)
                 {
                     var nodeState = xRNodeStates[j];

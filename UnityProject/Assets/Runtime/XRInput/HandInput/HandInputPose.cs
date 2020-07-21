@@ -10,26 +10,43 @@ namespace NaveXR.InputDevices
 {
     public class HandInputPose : HandInputBase
     {
-        public HandPoseData handPoseData { private set; get; }
+        public HandPoseData detail { private set; get; }
+
+        public HandPoseSimpleData simple { private set; get; }
+
+        private Handle mHandle;
 
         public bool isLeft { private set; get; }
 
         public HandInputPose(bool isLeft = true) : base(XRKeyCode.HandPose)
         {
-            handPoseData = new HandPoseData();
+            detail = new HandPoseData();
+            simple = new HandPoseSimpleData();
             this.isLeft = isLeft;
+        }
+
+        public void SetRelealyController(Handle handle)
+        {
+            mHandle = handle;
         }
 
         public override void UpdateState(UnityEngine.XR.InputDevice device)
         {
+            //记录：测试发现手势数据不一定有会有
             Hand hand;
             if (device.TryGetFeatureValue(CommonUsages.handData, out hand))
-                handPoseData.FilledWithUnityXRHand(ref hand);
+                detail.FilledWithUnityXRHand(ref hand);
+
+            //根据手柄和输入数据，填充简单的手势数据
+            if(mHandle != null)
+            {
+                //TODO：...
+            }
         }
 
         public void ApplyHumanoidHand(Animator animator)
         {
-            handPoseData.ApplyHumanoidHand(animator, isLeft);
+            detail.ApplyHumanoidHand(animator, isLeft);
         }
 
         public class HandPoseData
@@ -139,6 +156,18 @@ namespace NaveXR.InputDevices
                     }
                 }
             }
+        }
+
+        public class HandPoseSimpleData
+        {
+            public class Finger
+            {
+                public bool down;
+                public Vector3 pos;
+            }
+            public Finger Thumb = new Finger();
+            public Finger Index = new Finger();
+            public Finger Middle = new Finger();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace NaveXR.InputDevices
 
             //这里不使用UnityXR的按钮状态，因为会有感官上的延迟
             //device.TryGetFeatureValue(CommonUsages.triggerButton, out mPressed);
-            mPressed = OptimizPressByKeyForce(lastForce, mKeyForce, 0.0001f, 0.2f, 0.6f);
+            mPressed = OptimizPressByKeyForce(lastForce, mKeyForce, 0.01f, 0.2f, 0.6f);
             mBoolDown = !lastPressed && mPressed;
             mBoolUp = lastPressed && !mPressed;
         }
