@@ -9,6 +9,8 @@ namespace Assets.Samples
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
+
+            NaveXR.InputDevices.XRDevice.SetCurrentPlugin(InputPlugin.Unity_Oculus);
         }
 
         private void Update()

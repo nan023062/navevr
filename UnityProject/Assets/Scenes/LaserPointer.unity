@@ -1984,14 +1984,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89e40d65d58857046889d3453709180a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raycastDistance: 0.5
-  displayDistance: 1
-  cullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  force: 0
-  velocity: {x: 0, y: 0, z: 0}
-  acceleration: {x: 0, y: 0, z: 0}
 --- !u!20 &686427073
 Camera:
   m_ObjectHideFlags: 0
@@ -3721,9 +3713,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b9aaf5f7b987c45b4166bca1f7e2b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 10
 --- !u!114 &1113531990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3736,13 +3725,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecafbf63f541c894b800b7b67976e635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
 --- !u!4 &1113531991
 Transform:
   m_ObjectHideFlags: 0
@@ -3769,7 +3751,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bf41a298325a364284a156be4c6881a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useNative: 0
 --- !u!1 &1119163548
 GameObject:
   m_ObjectHideFlags: 0
@@ -5874,11 +5855,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e48096304908b8f45bb754e02c1c976f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &1690202819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6905,14 +6881,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1104068854, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
-      propertyPath: updateTransform
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 932599976, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
-      propertyPath: updateTransform
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 707f1a5fcd235d04ea4acaa0cc3ebc9f, type: 3}
