@@ -14,11 +14,11 @@ namespace NaveXR.InputDevices
 
             bool lastPressed = mPressed;
             mPressed = handUsage.primaryPressed;
+            mTouched = handUsage.primaryTouch;
             mBoolDown = !lastPressed && mPressed;
             mBoolUp = lastPressed && !mPressed;
 
             mKeyForce = handUsage.primaryTouchValue;
-            mTouched = isTouched(mKeyForce);
         }
     }
 }

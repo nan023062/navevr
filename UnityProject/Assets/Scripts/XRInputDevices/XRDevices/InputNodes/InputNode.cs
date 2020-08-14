@@ -75,6 +75,7 @@ namespace NaveXR.InputDevices
     /// <summary>
     /// 手柄数据
     /// </summary>
+    [System.Serializable]
     internal class HandInputNode : InputNode
     {
         public static readonly int fingerBoneNum = 31;
@@ -113,10 +114,12 @@ namespace NaveXR.InputDevices
 
         //primary
         public bool primaryPressed;
+        public bool primaryTouch;
         public float primaryTouchValue;
 
         //secondary
         public bool secondaryPressed;
+        public bool secondaryTouch;
         public float secondaryTouchValue;
 
         //primary2DAxis

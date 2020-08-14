@@ -230,69 +230,75 @@ namespace NaveXR.InputDevices
 
 #if UNITY_EDITOR
 
-        [SerializeField] private bool left = true;
+        [SerializeField] private HandInputNode leftHand;
+        [SerializeField] private HandInputNode rightHand;
 
-        [Header("Bool")]
-        [SerializeField] private bool isTracked;
-        [SerializeField] private bool primaryButton;
-        [SerializeField] private bool primaryTouch;
-        [SerializeField] private bool secondaryButton;
-        [SerializeField] private bool secondaryTouch;
-        [SerializeField] private bool gripButton;
-        [SerializeField] private bool triggerButton;
-        [SerializeField] private bool menuButton;
-        [SerializeField] private bool primary2DAxisClick;
-        [SerializeField] private bool primary2DAxisTouch;
-        [SerializeField] private bool thumbrest;
+        //[SerializeField] private bool left = true;
 
-        [Header("Float")]
-        [SerializeField] private float indexTouch;
-        [SerializeField] private float thumbTouch;
-        [SerializeField] private float batteryLevel;
-        [SerializeField] private float trigger;
-        [SerializeField] private float grip;
-        [SerializeField] private float indexFinger;
-        [SerializeField] private float middleFinger;
-        [SerializeField] private float ringFinger;
-        [SerializeField] private float pinkyFinger;
+        //[Header("Bool")]
+        //[SerializeField] private bool isTracked;
+        //[SerializeField] private bool primaryButton;
+        //[SerializeField] private bool primaryTouch;
+        //[SerializeField] private bool secondaryButton;
+        //[SerializeField] private bool secondaryTouch;
+        //[SerializeField] private bool gripButton;
+        //[SerializeField] private bool triggerButton;
+        //[SerializeField] private bool menuButton;
+        //[SerializeField] private bool primary2DAxisClick;
+        //[SerializeField] private bool primary2DAxisTouch;
+        //[SerializeField] private bool thumbrest;
 
-        [Header("Vector2")]
-        [SerializeField] private Vector2 primary2DAxis;
-        [SerializeField] private Vector2 dPad;
-        [SerializeField] private Vector2 secondary2DAxis;
+        //[Header("Float")]
+        //[SerializeField] private float indexTouch;
+        //[SerializeField] private float thumbTouch;
+        //[SerializeField] private float batteryLevel;
+        //[SerializeField] private float trigger;
+        //[SerializeField] private float grip;
+        //[SerializeField] private float indexFinger;
+        //[SerializeField] private float middleFinger;
+        //[SerializeField] private float ringFinger;
+        //[SerializeField] private float pinkyFinger;
+
+        //[Header("Vector2")]
+        //[SerializeField] private Vector2 primary2DAxis;
+        //[SerializeField] private Vector2 dPad;
+        //[SerializeField] private Vector2 secondary2DAxis;
 
         private void TestXRInputUsages()
         {
-            var trigger = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(left ? XRNode.LeftHand : XRNode.RightHand);
+            leftHand = XRDevice.leftHandUsage;
+            rightHand = XRDevice.rightHandUsage;
 
-            //Vector2
-            trigger.TryGetFeatureValue(CommonUsages.primary2DAxis, out primary2DAxis);
-            trigger.TryGetFeatureValue(CommonUsages.dPad, out dPad);
-            trigger.TryGetFeatureValue(CommonUsages.secondary2DAxis, out secondary2DAxis);
+            //var trigger = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(left ? XRNode.LeftHand : XRNode.RightHand);
 
-            //Float
-            trigger.TryGetFeatureValue(CommonUsages.indexTouch, out indexTouch);
-            trigger.TryGetFeatureValue(CommonUsages.thumbTouch, out thumbTouch);
-            trigger.TryGetFeatureValue(CommonUsages.batteryLevel, out batteryLevel);
-            trigger.TryGetFeatureValue(CommonUsages.trigger, out this.trigger);
-            trigger.TryGetFeatureValue(CommonUsages.grip, out grip);
-            trigger.TryGetFeatureValue(CommonUsages.indexFinger, out indexFinger);
-            trigger.TryGetFeatureValue(CommonUsages.middleFinger, out middleFinger);
-            trigger.TryGetFeatureValue(CommonUsages.ringFinger, out ringFinger);
-            trigger.TryGetFeatureValue(CommonUsages.pinkyFinger, out pinkyFinger);
+            ////Vector2
+            //trigger.TryGetFeatureValue(CommonUsages.primary2DAxis, out primary2DAxis);
+            //trigger.TryGetFeatureValue(CommonUsages.dPad, out dPad);
+            //trigger.TryGetFeatureValue(CommonUsages.secondary2DAxis, out secondary2DAxis);
 
-            //Bool
-            trigger.TryGetFeatureValue(CommonUsages.isTracked, out isTracked);
-            trigger.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButton);
-            trigger.TryGetFeatureValue(CommonUsages.primaryTouch, out primaryTouch);
-            trigger.TryGetFeatureValue(CommonUsages.secondaryButton, out secondaryButton);
-            trigger.TryGetFeatureValue(CommonUsages.secondaryTouch, out secondaryTouch);
-            trigger.TryGetFeatureValue(CommonUsages.gripButton, out gripButton);
-            trigger.TryGetFeatureValue(CommonUsages.triggerButton, out triggerButton);
-            trigger.TryGetFeatureValue(CommonUsages.menuButton, out menuButton);
-            trigger.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out primary2DAxisClick);
-            trigger.TryGetFeatureValue(CommonUsages.primary2DAxisTouch, out primary2DAxisTouch);
-            trigger.TryGetFeatureValue(CommonUsages.thumbrest, out thumbrest);
+            ////Float
+            //trigger.TryGetFeatureValue(CommonUsages.indexTouch, out indexTouch);
+            //trigger.TryGetFeatureValue(CommonUsages.thumbTouch, out thumbTouch);
+            //trigger.TryGetFeatureValue(CommonUsages.batteryLevel, out batteryLevel);
+            //trigger.TryGetFeatureValue(CommonUsages.trigger, out this.trigger);
+            //trigger.TryGetFeatureValue(CommonUsages.grip, out grip);
+            //trigger.TryGetFeatureValue(CommonUsages.indexFinger, out indexFinger);
+            //trigger.TryGetFeatureValue(CommonUsages.middleFinger, out middleFinger);
+            //trigger.TryGetFeatureValue(CommonUsages.ringFinger, out ringFinger);
+            //trigger.TryGetFeatureValue(CommonUsages.pinkyFinger, out pinkyFinger);
+
+            ////Bool
+            //trigger.TryGetFeatureValue(CommonUsages.isTracked, out isTracked);
+            //trigger.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButton);
+            //trigger.TryGetFeatureValue(CommonUsages.primaryTouch, out primaryTouch);
+            //trigger.TryGetFeatureValue(CommonUsages.secondaryButton, out secondaryButton);
+            //trigger.TryGetFeatureValue(CommonUsages.secondaryTouch, out secondaryTouch);
+            //trigger.TryGetFeatureValue(CommonUsages.gripButton, out gripButton);
+            //trigger.TryGetFeatureValue(CommonUsages.triggerButton, out triggerButton);
+            //trigger.TryGetFeatureValue(CommonUsages.menuButton, out menuButton);
+            //trigger.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out primary2DAxisClick);
+            //trigger.TryGetFeatureValue(CommonUsages.primary2DAxisTouch, out primary2DAxisTouch);
+            //trigger.TryGetFeatureValue(CommonUsages.thumbrest, out thumbrest);
         }
 #endif
         
