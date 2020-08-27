@@ -1,0 +1,8 @@
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\bin\Debug\UnityEngine.UI.dll
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\bin\Debug\UnityEngine.UI.pdb
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\bin\Debug\UnityEngine.dll
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\obj\Debug\UnityEngine.UI.csprojAssemblyReference.cache
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\obj\Debug\UnityEngine.UI.csproj.CoreCompileInputs.cache
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\obj\Debug\UnityEngine.UI.csproj.CopyComplete
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\obj\Debug\UnityEngine.UI.dll
+E:\CodeRepositories\VRInputSystem\Unity-Technologies-ui\UnityEngine.UI\obj\Debug\UnityEngine.UI.pdb

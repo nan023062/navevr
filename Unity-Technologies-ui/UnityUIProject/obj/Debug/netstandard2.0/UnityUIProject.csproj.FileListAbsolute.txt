@@ -1,0 +1,4 @@
+D:\XRInputSystem\Unity-Technologies-ui\UnityUIProject\obj\Debug\netstandard2.0\UnityUIProject.csprojAssemblyReference.cache
+D:\XRInputSystem\Unity-Technologies-ui\UnityUIProject\obj\Debug\netstandard2.0\UnityUIProject.AssemblyInfoInputs.cache
+D:\XRInputSystem\Unity-Technologies-ui\UnityUIProject\obj\Debug\netstandard2.0\UnityUIProject.AssemblyInfo.cs
+D:\XRInputSystem\Unity-Technologies-ui\UnityUIProject\obj\Debug\netstandard2.0\UnityUIProject.csproj.CoreCompileInputs.cache
