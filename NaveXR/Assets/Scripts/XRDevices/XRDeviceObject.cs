@@ -21,6 +21,7 @@ namespace Nave.XR
 
         [Header("Draw Gizmos")]
         [SerializeField] Color color = Color.red;
+
         private Mesh mesh = null;
 
         [ExecuteInEditMode]
@@ -63,21 +64,21 @@ namespace Nave.XR
 
         [Header("InputDevice & XRNodeState")]
         [NotModify, SerializeField] private ulong m_UniqueId;
+
         [NotModify, SerializeField] private string m_DeviceName;
+
         [SerializeField] private NodeType nodeType = NodeType.Head;
         public ulong UniqueId { get { return m_UniqueId; } }
         public NodeType NodeType { get { return nodeType; } }
         public bool isTracked { get { return m_UniqueId > 0; } }
         public string device { get { return m_DeviceName; } }
 
-        internal void Connected(Metadata xRNodeUsage)
+        internal void Connected(Metadata metadata)
         {
-            m_UniqueId = xRNodeUsage.uniqueID;
-            m_DeviceName = xRNodeUsage.name;
-            UpdateInputDeviceAndXRNode(xRNodeUsage);
-            Debug.LogFormat("Connected Controller: nodeType={0},uniqueId={1},device={2}!",
-                nodeType, m_UniqueId, xRNodeUsage.name);
-
+            m_UniqueId = metadata.uniqueID;
+            m_DeviceName = metadata.name;
+            UpdateInputDeviceAndXRNode(metadata);
+            XRDevice.Log($"Virtual Device Connected : nodeType={nodeType},id={m_UniqueId},device={m_DeviceName}!");
             InitHandOffset();
             OnConnected();
         }
@@ -86,7 +87,7 @@ namespace Nave.XR
 
         internal void Disconnected()
         {
-            Debug.LogFormat("Disconnect Controller: nodeType={0},uniqueId={1}!", nodeType, m_UniqueId);
+            XRDevice.Log($"Virtual Device Disconnect : nodeType={nodeType},id={m_UniqueId}!");
             m_UniqueId = 0;
             m_DeviceName = string.Empty;
             OnDisconnected();

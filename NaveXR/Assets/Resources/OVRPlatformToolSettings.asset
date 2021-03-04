@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5c9d47e2e2e61b46a7d58434b885e1e, type: 3}
+  m_Script: {fileID: 11500000, guid: cd7bb81df5b74b34dadbf531f381a26b, type: 3}
   m_Name: OVRPlatformToolSettings
   m_EditorClassIdentifier: 
   riftRedistPackages: []

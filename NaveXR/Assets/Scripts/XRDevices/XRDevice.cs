@@ -51,6 +51,20 @@ namespace Nave.XR
             }
         }
 
+        #region Self Log
+
+        public static void Log(string log)
+        {
+            UnityEngine.Debug.Log($"<b>{typeof(XRDevice).FullName}</b> : {log}");
+        }
+
+        public static void LogError(string log)
+        {
+            UnityEngine.Debug.LogError($"<b>{typeof(XRDevice).FullName}</b> : {log}");
+        }
+
+        #endregion
+
         #region Main
 
         private static XRDevice _instance;
@@ -111,13 +125,14 @@ namespace Nave.XR
             s_evn = null;
             s_proc = null;
             _instance = null;
-            Debug.Log("<b>[NaveXR.XRDevice]</b> disposed !");
+            Log("disposed !");
         }
 
-        private void OnUnityXRDeviceLoaded(string deviceName)
+        private void OnUnityXRDeviceLoaded(string deviceLib)
         {
             if (!XRSettings.enabled) XRSettings.enabled = true;
-            Debug.LogFormat(" OnUnityXRDeviceLoaded() :: deviceName = {0}, mode = {1} , isDeviceActive = {2}!!", deviceName, UnityEngine.XR.XRDevice.model, XRSettings.isDeviceActive);
+            var headDevice = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.Head);
+            Log($" OnUnityXRDeviceLoaded() lib = {deviceLib}, device = {headDevice.name} , isActive = {XRSettings.isDeviceActive}!!");
             checkTouchPad();
         }
 
@@ -184,8 +199,7 @@ namespace Nave.XR
         #region Device Evn
 
         private static BaseEvn s_evn;
-
-
+        
         public static event XRDeviceNodeDelegate onDeviceConnected;
 
         public static event XRDeviceNodeDelegate onDeviceDisconnected;
@@ -201,11 +215,11 @@ namespace Nave.XR
             if (s_evn != null) {
                 GetInstance().StartCoroutine(LoadLibAsync((result)=> {
                     if(result) s_evn.Initlize(OnInputPluginInitlized);
-                    else OnInputPluginInitlized($"<b>[Nave.XR.XRDevice]</b> InitEvn: 驱动加载失败 !");
+                    else OnInputPluginInitlized("InitEvn: 驱动加载失败 !");
                 }));
             }
             else {
-                OnInputPluginInitlized($"<b>[Nave.XR.XRDevice]</b> InitEvn: 环境对象创建失败 !");
+                OnInputPluginInitlized("InitEvn: 环境对象创建失败 !");
             }
         }
 
@@ -227,93 +241,91 @@ namespace Nave.XR
         private static void OnInputPluginInitlized(string error)
         {
             if (string.IsNullOrEmpty(error)) {
-                Debug.Log($"<b>[Nave.XR.XRDevice]</b> Successfully Init [{s_evn.name}] !");
+                Log($" Successfully Init [{s_evn.name}] !");
                 UnityEngine.XR.XRDevice.SetTrackingSpaceType(TrackingSpaceType.RoomScale);
                 XRInputSubsystem xRInput = new XRInputSubsystem();
                 onInputPluginInitlized?.Invoke(true);
             }
             else {
-                Debug.LogError($"<b>[Nave.XR.XRDevice]</b> Failed Init Evn  error: {error} !");
+                LogError($" Failed Init Evn  error: {error} !");
                 onInputPluginInitlized?.Invoke(false);
             }
         }
 
-        internal static void OnXRNodeConnected(Metadata xRNodeUsage)
+        internal static void OnXRNodeConnected(Metadata metadata)
         {
             XRNode xRNode = XRNode.HardwareTracker;
-            if (xRNodeUsage.type == NodeType.Head)
+            if (metadata.type == NodeType.Head)
             {
                 xRNode = XRNode.Head;
             }
-            else if (xRNodeUsage.type == NodeType.LeftHand)
+            else if (metadata.type == NodeType.LeftHand)
             {
                 xRNode = XRNode.LeftHand;
             }
-            else if (xRNodeUsage.type == NodeType.RightHand)
+            else if (metadata.type == NodeType.RightHand)
             {
                 xRNode = XRNode.RightHand;
             }
-            else if (xRNodeUsage.type == NodeType.PeliveTrack)
+            else if (metadata.type == NodeType.PeliveTrack)
             {
 
             }
-            else if (xRNodeUsage.type == NodeType.LeftFoot)
+            else if (metadata.type == NodeType.LeftFoot)
             {
 
             }
-            else if (xRNodeUsage.type == NodeType.RightFoot)
+            else if (metadata.type == NodeType.RightFoot)
             {
 
             }
 
-            Debug.LogFormat("XRDevice.onDeviceConnected... [nodeType={0}，name={1}]", xRNodeUsage.type, xRNodeUsage.name);
-            onDeviceConnected?.Invoke(xRNode, xRNodeUsage.name);
+            Log($" onDeviceConnected... [type = {metadata.type}，name = {metadata.name}]");
+            onDeviceConnected?.Invoke(xRNode, metadata.name);
 
             //查找未匹配的设备列表
-            var devices = captures.Where((d) => !d.isTracked && d.NodeType == xRNodeUsage.type);
-            if (devices != null && devices.Count() > 0)
-            {
-                foreach (var device in devices) device.Connected(xRNodeUsage);
+            var devices = captures.Where((d) => !d.isTracked && d.NodeType == metadata.type);
+            if (devices != null && devices.Count() > 0) {
+                foreach (var device in devices) device.Connected(metadata);
             }
 
             checkTouchPad();
         }
 
-        internal static void OnXRNodeDisconnected(Metadata xRNodeUsage)
+        internal static void OnXRNodeDisconnected(Metadata metadata)
         {
             XRNode xRNode = XRNode.HardwareTracker;
-            if (xRNodeUsage.type == NodeType.Head)
+            if (metadata.type == NodeType.Head)
             {
                 xRNode = XRNode.Head;
             }
-            else if (xRNodeUsage.type == NodeType.LeftHand)
+            else if (metadata.type == NodeType.LeftHand)
             {
                 xRNode = XRNode.LeftHand;
             }
-            else if (xRNodeUsage.type == NodeType.RightHand)
+            else if (metadata.type == NodeType.RightHand)
             {
                 xRNode = XRNode.RightHand;
             }
-            else if (xRNodeUsage.type == NodeType.PeliveTrack)
+            else if (metadata.type == NodeType.PeliveTrack)
             {
 
             }
-            else if (xRNodeUsage.type == NodeType.LeftFoot)
+            else if (metadata.type == NodeType.LeftFoot)
             {
 
             }
-            else if (xRNodeUsage.type == NodeType.RightFoot)
+            else if (metadata.type == NodeType.RightFoot)
             {
 
             }
 
-            onDeviceDisconnected?.Invoke(xRNode, xRNodeUsage.name);
-            Debug.LogFormat("XRDevice.onDeviceDisconnected... [nodeType={0}，name={1}]", xRNode, xRNodeUsage.name);
+            onDeviceDisconnected?.Invoke(xRNode, metadata.name);
+            Log($" onDeviceDisconnected... [type = {xRNode}，name = {metadata.name}]");
 
             //查找已匹配的设备列表
-            var devices = captures.Where((d) => d.UniqueId == xRNodeUsage.uniqueID && d.NodeType == xRNodeUsage.type);
-            if (devices != null && devices.Count() > 0)
-            {
+            var devices = captures.Where((d) => d.UniqueId == metadata.uniqueID && d.NodeType == metadata.type);
+            if (devices != null && devices.Count() > 0) {
                 foreach (var device in devices) device.Disconnected();
             }
 

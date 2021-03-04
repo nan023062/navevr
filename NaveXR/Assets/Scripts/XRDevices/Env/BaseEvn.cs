@@ -42,20 +42,11 @@ namespace Nave.XR
             //TODO: 实现驱动加载和初始化
             XRDevice.GetInstance().StartCoroutine(InitEvnAsync((error)=> {
                 valid = string.IsNullOrEmpty(error);
+                onResult?.Invoke(error);
             }));
         }
 
         protected abstract IEnumerator InitEvnAsync(System.Action<string> onResult);
-
-        protected void OnDeviceConnnected(Metadata usage)
-        {
-            XRDevice.OnXRNodeConnected(usage);
-        }
-
-        protected void OnDeviceDisconnnected(Metadata usage)
-        {
-            XRDevice.OnXRNodeDisconnected(usage);
-        }
 
         internal virtual void Update() { }
 
@@ -80,31 +71,24 @@ namespace Nave.XR
 
         internal void UpdateInputDeviceStates()
         {
-            for (int i = xRNodeStates.Count - 1; i >= 0; i--)
-            {
+            for (int i = xRNodeStates.Count - 1; i >= 0; i--) {
                 var nodeState = xRNodeStates[i];
-                if (nodeState.uniqueID == XRDevice.headMeta.uniqueID)
-                {
+                if (nodeState.uniqueID == XRDevice.headMeta.uniqueID) {
                     FillPoseMetadata(XRDevice.headMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.pelivMeta.uniqueID)
-                {
+                else if (nodeState.uniqueID == XRDevice.pelivMeta.uniqueID) {
                     FillPoseMetadata(XRDevice.pelivMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.leftFootMeta.uniqueID)
-                {
+                else if (nodeState.uniqueID == XRDevice.leftFootMeta.uniqueID) {
                     FillPoseMetadata(XRDevice.leftFootMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.rightFootMeta.uniqueID)
-                {
+                else if (nodeState.uniqueID == XRDevice.rightFootMeta.uniqueID) {
                     FillPoseMetadata(XRDevice.rightFootMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.leftHandMeta.uniqueID)
-                {
+                else if (nodeState.uniqueID == XRDevice.leftHandMeta.uniqueID) {
                     FillMetadata(XRDevice.leftHandMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.rightHandMeta.uniqueID)
-                {
+                else if (nodeState.uniqueID == XRDevice.rightHandMeta.uniqueID) {
                     FillMetadata(XRDevice.rightHandMeta, ref nodeState);
                 }
             }
@@ -118,78 +102,71 @@ namespace Nave.XR
             xRNode.TryGetRotation(out hardware.rotation);
         }
 
-        private void TryCheckNodeState(Metadata xRNodeUsage, XRNode xRNode)
+        private void TryCheckNodeState(Metadata metadata, XRNode xRNode)
         {
             XRNodeState xRNodeState = default(XRNodeState);
 
-            for (int i = xRNodeStates.Count - 1; i >= 0; i--)
-            {
+            for (int i = xRNodeStates.Count - 1; i >= 0; i--) {
                 var nodeState = xRNodeStates[i];
-                if (nodeState.nodeType == xRNode)
-                {
-                    if (nodeState.uniqueID == xRNodeUsage.uniqueID) return;
+                if (nodeState.nodeType == xRNode) {
+                    if (nodeState.uniqueID == metadata.uniqueID) return;
                     if (xRNodeState.uniqueID == 0) xRNodeState = nodeState;
-                    if (!xRNodeUsage.isValid)
-                    {
-                        InputTracking_nodeAdded(xRNodeUsage, ref nodeState);
+                    if (!metadata.isValid) {
+                        InputTracking_nodeAdded(metadata, ref nodeState);
                         return;
                     }
                 }
             }
 
-            if (xRNodeUsage.isValid) InputTracking_nodeRemoved(xRNodeUsage);
-            if (xRNodeState.uniqueID > 0) InputTracking_nodeAdded(xRNodeUsage, ref xRNodeState);
+            if (metadata.isValid) InputTracking_nodeRemoved(metadata);
+            if (xRNodeState.uniqueID > 0) InputTracking_nodeAdded(metadata, ref xRNodeState);
         }
 
-        private void TryCheckTrackNodeState(Metadata xRNodeUsage, XRNode xRNode)
+        private void TryCheckTrackNodeState(Metadata metadata, XRNode xRNode)
         {
             XRNodeState xRNodeState = default(XRNodeState);
             var pelvis = XRDevice.pelivMeta;
             var lfoot = XRDevice.leftFootMeta;
             var rfoot = XRDevice.rightFootMeta;
 
-            for (int i = xRNodeStates.Count - 1; i >= 0; i--)
-            {
+            for (int i = xRNodeStates.Count - 1; i >= 0; i--) {
                 var nodeState = xRNodeStates[i];
                 ulong uniqueID = nodeState.uniqueID;
-                if (nodeState.nodeType == xRNode)
-                {
-                    if (nodeState.uniqueID == xRNodeUsage.uniqueID) return;
+                if (nodeState.nodeType == xRNode) {
+                    if (nodeState.uniqueID == metadata.uniqueID) return;
 
                     if ((pelvis.isValid && uniqueID == pelvis.uniqueID) ||
                         (lfoot.isValid && uniqueID == lfoot.uniqueID) ||
-                        (rfoot.isValid && uniqueID == rfoot.uniqueID))
-                    {
+                        (rfoot.isValid && uniqueID == rfoot.uniqueID)) {
                         continue;
                     }
 
                     if (xRNodeState.uniqueID == 0) xRNodeState = nodeState;
 
-                    if (!xRNodeUsage.isValid)
-                    {
-                        InputTracking_nodeAdded(xRNodeUsage, ref nodeState);
+                    if (!metadata.isValid) {
+                        InputTracking_nodeAdded(metadata, ref nodeState);
                         return;
                     }
                 }
             }
 
-            if (xRNodeUsage.isValid) InputTracking_nodeRemoved(xRNodeUsage);
-            if (xRNodeState.uniqueID > 0) InputTracking_nodeAdded(xRNodeUsage, ref xRNodeState);
+            if (metadata.isValid) InputTracking_nodeRemoved(metadata);
+            if (xRNodeState.uniqueID > 0) InputTracking_nodeAdded(metadata, ref xRNodeState);
         }
 
-        private void InputTracking_nodeAdded(Metadata xRNodeUsage, ref XRNodeState xRNode)
+        private void InputTracking_nodeAdded(Metadata metadata, ref XRNodeState xRNodeState)
         {
-            if (xRNodeUsage == null || xRNodeUsage.isValid) return;
-            InputDevice inputDevice = U3DInputDevices.GetDeviceAtXRNode(xRNode.nodeType);
-            xRNodeUsage.OnConnected(xRNode.uniqueID, inputDevice.name);
-            OnDeviceConnnected(xRNodeUsage);
+            if (metadata == null || metadata.isValid) return;
+            InputDevice inputDevice = U3DInputDevices.GetDeviceAtXRNode(xRNodeState.nodeType);
+            metadata.Connected(xRNodeState.uniqueID, inputDevice.name);
+            XRDevice.OnXRNodeConnected(metadata);
         }
 
-        private void InputTracking_nodeRemoved(Metadata xRNodeUsage)
+        private void InputTracking_nodeRemoved(Metadata metadata)
         {
-            if (xRNodeUsage == null || !xRNodeUsage.isValid) return;
-            OnDeviceDisconnnected(xRNodeUsage);
-            xRNodeUsage.OnDisconnect();
+            if (metadata == null || !metadata.isValid) return;
+            XRDevice.OnXRNodeDisconnected(metadata);
+            metadata.Disconnect();
         }
     }
 }

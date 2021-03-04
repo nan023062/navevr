@@ -52,13 +52,13 @@ namespace Nave.XR
             this.type = type;
         }
 
-        internal virtual void OnConnected(ulong uniquedId, string name)
+        internal virtual void Connected(ulong uniquedId, string name)
         {
             m_UniqueId = uniquedId;
             m_Name = name;
         }
 
-        internal virtual void OnDisconnect()
+        internal virtual void Disconnect()
         {
             m_UniqueId = 0;
             m_Name = string.Empty;
@@ -69,6 +69,7 @@ namespace Nave.XR
         public void SetPose(Pose pose) { position = pose.position; rotation = pose.rotation; }
 
         public Vector3 position;
+
         public Quaternion rotation;
     }
 
@@ -96,15 +97,15 @@ namespace Nave.XR
             //手势数据 valve index
         }
 
-        internal override void OnConnected(ulong uniquedId, string name)
+        internal override void Connected(ulong uniquedId, string name)
         {
-            base.OnConnected(uniquedId, name);
+            base.Connected(uniquedId, name);
             isPad = name.Contains("Vive") || name.ToLower().Contains("wmr");
         }
 
-        internal override void OnDisconnect()
+        internal override void Disconnect()
         {
-            base.OnDisconnect();
+            base.Disconnect();
             isPad = false;
         }
 
