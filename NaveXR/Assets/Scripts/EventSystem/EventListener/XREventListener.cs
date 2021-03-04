@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public class XREventListener : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler
     {

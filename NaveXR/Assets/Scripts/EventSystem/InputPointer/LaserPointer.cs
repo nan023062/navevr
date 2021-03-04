@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using Nave.XR;
+using Nave.VR;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     /// <summary>
     /// 射线输入触发点
@@ -58,12 +58,12 @@ namespace Nave.XR
         protected override void OnEnable()
         {
             base.OnEnable();
-            NaveXR.Regist(this);
+            NaveVR.Regist(this);
         }
 
         protected override void OnDisable()
         {
-            NaveXR.Remove(this);
+            NaveVR.Remove(this);
             base.OnDisable();
         }
 
@@ -75,13 +75,13 @@ namespace Nave.XR
 
                 //左手按鍵狀態
                 if (inputType == InputType.LeftHand) {
-                    Vector2 aixs = NaveXR.GetTouchAxis(0);
+                    Vector2 aixs = NaveVR.GetTouchAxis(0);
                     if (aixs.sqrMagnitude > scrollThrelod)
                         scrollDelta = aixs * handScrollSensitivity;
                 }
                 //右手按鍵狀態
                 else if (inputType == InputType.RightHand) {
-                    Vector2 aixs = NaveXR.GetTouchAxis(1);
+                    Vector2 aixs = NaveVR.GetTouchAxis(1);
                     if (aixs.sqrMagnitude > scrollThrelod)
                         scrollDelta = aixs * handScrollSensitivity;
                 }
@@ -113,14 +113,14 @@ namespace Nave.XR
             //左手按鍵狀態
             if (inputType == InputType.LeftHand)
             {
-                isPressed = NaveXR.IsLeftKeyDown(KeyCode.Trigger);
-                isReleased = NaveXR.IsLeftKeyUp(KeyCode.Trigger);
+                isPressed = NaveVR.IsLeftKeyDown(KeyCode.Trigger);
+                isReleased = NaveVR.IsLeftKeyUp(KeyCode.Trigger);
             }
             //右手按鍵狀態
             else if (inputType == InputType.RightHand)
             {
-                isPressed = NaveXR.IsRightKeyDown(KeyCode.Trigger);
-                isReleased = NaveXR.IsRightKeyUp(KeyCode.Trigger);
+                isPressed = NaveVR.IsRightKeyDown(KeyCode.Trigger);
+                isReleased = NaveVR.IsRightKeyUp(KeyCode.Trigger);
             }
             //Unity原生模式狀態
             else if (inputType == InputType.Mouse)

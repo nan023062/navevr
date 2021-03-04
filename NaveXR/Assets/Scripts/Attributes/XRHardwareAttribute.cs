@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     /// <summary>
     /// 支持的VR硬件

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public abstract class BaseInputPointer : MonoBehaviour
     {

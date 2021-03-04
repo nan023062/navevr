@@ -1,6 +1,6 @@
 ﻿
 using UnityEngine;
-namespace Nave.XR
+namespace Nave.VR
 {
     /// <summary>
     /// 绑定专用XR模式的Module和Input

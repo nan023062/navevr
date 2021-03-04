@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     /// <summary>
     /// XR UI射线检测

@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using Nave.XR;
+using Nave.VR;
 
 namespace Assets.Samples
 {
@@ -27,7 +27,7 @@ namespace Assets.Samples
 
         }
 
-        public void Proc(ref Nave.XR.Pose head, ref Nave.XR.Pose leftHand, ref Nave.XR.Pose rightHand, ref Nave.XR.Pose pelive, ref Nave.XR.Pose leftFoot, ref Nave.XR.Pose rightFoot)
+        public void Proc(ref Nave.VR.Pose head, ref Nave.VR.Pose leftHand, ref Nave.VR.Pose rightHand, ref Nave.VR.Pose pelive, ref Nave.VR.Pose leftFoot, ref Nave.VR.Pose rightFoot)
         {
 
 

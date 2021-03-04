@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public class HandPose_skeleton
     {

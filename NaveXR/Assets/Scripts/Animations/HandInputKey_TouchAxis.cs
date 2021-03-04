@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public class HandInputKey_TouchAxis : HandInputKey_Animation
     {

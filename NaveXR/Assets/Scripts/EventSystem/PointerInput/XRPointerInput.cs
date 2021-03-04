@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public class XRPointerInput : UnityEngine.EventSystems.BaseInput
     {

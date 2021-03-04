@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.XR;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public class HandInputKey_Button : HandInputKey_Animation
     {

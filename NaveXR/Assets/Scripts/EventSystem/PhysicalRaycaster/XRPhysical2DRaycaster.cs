@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     /// <summary>
     /// XR 2D物理射线检测

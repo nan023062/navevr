@@ -4,12 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nave.XR
+namespace Nave.VR
 {
     [XRHardware()]
     public class OculusCV1Controller : Controller
     {
+        protected override void OnUpdate()
+        {
+            base.OnUpdate();
 
+
+        }
 
     }
 }

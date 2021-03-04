@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 #endif
 
-namespace Nave.XR
+namespace Nave.VR
 {
     public class NotModifyAttribute :  UnityEngine.PropertyAttribute
     {
