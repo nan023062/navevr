@@ -1,10 +1,9 @@
-﻿using UnityEngine;
-using System;
-using UnityEngine.XR;
+﻿using System;
+using UnityEngine;
 
 namespace Nave.XR
 {
-    public class Headset : Hardware
+    public class Tracker : Hardware
     {
         protected override void OnUpdate()
         {

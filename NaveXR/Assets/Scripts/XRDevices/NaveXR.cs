@@ -11,16 +11,23 @@ namespace Nave.XR
 
     public delegate void XRDeviceNodeDelegate(XRNode nodeType, string deviceName);
 
-    /// <summary>
-    /// 单利XR设备及输入管理器
-    /// 1 负责管理设备实例
-    /// 2 负责更新设备KeyCode的状态
-    /// 3 负责XR设备兼容适配
-    /// </summary>
-    public partial class XRDevice : MonoBehaviour
+    public class XRLib
     {
-        private static Coroutine co;
+        public const string OpenVR = "OpenVR";
 
+        public const string Oculus = "Oculus";
+    }
+    public enum Evn
+    {
+        UnityXR = 0,
+        Oculusvr = 1,
+#if SUPPORT_STEAM_VR
+        Steamvr = 2,
+#endif
+    }
+
+    public partial class NaveXR : MonoBehaviour
+    {
         public static bool isEnabled
         {
             get
@@ -51,25 +58,44 @@ namespace Nave.XR
             }
         }
 
+        public static void GetHandInputOffset(bool left, out Vector3 position, out Quaternion rotation)
+        {
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+
+            if (DriverName == XRLib.OpenVR)
+            {
+                position = new Vector3(left ? -0.003f : 0.003f, -0.006f, -0.1f);
+                rotation = Quaternion.identity;
+            }
+            else if (DriverName == XRLib.Oculus)
+            {
+                float tan = Mathf.Tan(40f * Mathf.Deg2Rad);
+                float z = -0.034f;
+                position = new Vector3(left ? -0.0075f : 0.0075f, z * tan, z);
+                rotation = Quaternion.Euler(-40f, 0f, 0f);
+            }
+        }
+
         #region Self Log
 
         public static void Log(string log)
         {
-            UnityEngine.Debug.Log($"<b>{typeof(XRDevice).FullName}</b> : {log}");
+            UnityEngine.Debug.Log($"<b>{typeof(NaveXR).FullName}</b> : {log}");
         }
 
         public static void LogError(string log)
         {
-            UnityEngine.Debug.LogError($"<b>{typeof(XRDevice).FullName}</b> : {log}");
+            UnityEngine.Debug.LogError($"<b>{typeof(NaveXR).FullName}</b> : {log}");
         }
 
         #endregion
 
         #region Main
 
-        private static XRDevice _instance;
+        private static NaveXR _instance;
 
-        internal static XRDevice GetInstance() {
+        internal static NaveXR GetInstance() {
             CheckSingleton();
             return _instance;
         }
@@ -78,10 +104,10 @@ namespace Nave.XR
         {
             if(_instance == null)
             {
-                var go = new GameObject("[XInputRDevices]", typeof(XRDevice));
+                var go = new GameObject("[NaveXR]", typeof(NaveXR));
                 GameObject.DontDestroyOnLoad(go);
                 go.hideFlags = HideFlags.NotEditable;
-                _instance = go.GetComponent<XRDevice>();
+                _instance = go.GetComponent<NaveXR>();
             }
         }
 
@@ -90,6 +116,8 @@ namespace Nave.XR
             Debug.Assert(_instance == null, GetType().FullName + ": 单例类被多次实例化！");
             _instance = this;
             gameObject.hideFlags = HideFlags.NotEditable | HideFlags.DontSave;
+            DontDestroyOnLoad(gameObject);
+            InitEvn(evn);
             InitlizeInputs();
         }
 
@@ -103,14 +131,12 @@ namespace Nave.XR
 
         private void Update()
         {
-            if(s_evn != null && s_evn.valid){
-                s_evn.Update();
-                s_evn.CheckDeviceRemovedOrAdded();
-                s_evn.UpdateInputDeviceStates();
-            }
+            //根据运行环境 读取源数据
+            s_evn?.UpdateAllControllerState();
+
             ProcMetaPose();
-            UpdateInputStates();
-            UpdateInputDeviceAndNodeStatess();
+
+            UpdateStandardInputState();
         }
 
         private void OnDisable()
@@ -123,16 +149,15 @@ namespace Nave.XR
             ClearInputs();
             s_evn?.Release();
             s_evn = null;
-            s_proc = null;
             _instance = null;
             Log("disposed !");
         }
 
-        private void OnUnityXRDeviceLoaded(string deviceLib)
+        private void OnUnityXRDeviceLoaded(string device)
         {
             if (!XRSettings.enabled) XRSettings.enabled = true;
             var headDevice = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.Head);
-            Log($" OnUnityXRDeviceLoaded() lib = {deviceLib}, device = {headDevice.name} , isActive = {XRSettings.isDeviceActive}!!");
+            Log($" OnUnityXRDeviceLoaded() device = {device}, name = {headDevice.name} , isActive = {XRSettings.isDeviceActive}!!");
             checkTouchPad();
         }
 
@@ -152,13 +177,36 @@ namespace Nave.XR
 
         internal static Metadata rightFootMeta = new Metadata(NodeType.Head);
 
-        private static IMatedataProcessor s_proc;
+        [Header("数据处理器")]
+        public IMatedataProcessor proc;
+
+        internal static Metadata GetMetaDara(NodeType nodeType)
+        {
+            switch (nodeType)
+            {
+                case NodeType.Head:
+                    return headMeta;
+                case NodeType.LeftHand:
+                    return leftHandMeta;
+                case NodeType.RightHand:
+                    return rightHandMeta;
+                case NodeType.Pelive:
+                    return pelivMeta;
+                case NodeType.LeftFoot:
+                    return leftFootMeta;
+                case NodeType.RightFoot:
+                    return rightFootMeta;
+                default:
+                    return headMeta;
+            }
+        }
 
         private static void ProcMetaPose()
         {
-            if (s_proc == null || !s_proc.Running()) return;
+            if (_instance.proc == null || 
+                !_instance.proc.Running()) return;
 
-            s_proc.PreProc();
+            _instance.proc.PreProc();
 
             var head = headMeta.GetPose();
 
@@ -172,7 +220,7 @@ namespace Nave.XR
 
             var rightFoot = rightFootMeta.GetPose();
 
-            s_proc.Proc(ref head, ref leftHand, ref rightHand, ref pelive, ref leftFoot, ref rightFoot);
+            _instance.proc.Proc(ref head, ref leftHand, ref rightHand, ref pelive, ref leftFoot, ref rightFoot);
 
             headMeta.SetPose(head);
 
@@ -186,17 +234,15 @@ namespace Nave.XR
 
             rightFootMeta.SetPose(rightFoot);
 
-            s_proc.PostProc();
-        }
-
-        public static void SetMetaProc<T>(T proc) where T : IMatedataProcessor
-        {
-            s_proc = proc;
+            _instance.proc.PostProc();
         }
 
         #endregion
 
         #region Device Evn
+
+        [Header("VR运行环境")]
+        public Evn evn = Evn.Oculusvr;
 
         private static BaseEvn s_evn;
         
@@ -209,17 +255,34 @@ namespace Nave.XR
         /// <summary>
         /// 设置当前运行环境
         /// </summary>
-        public static void InitEvn(System.Type evnType, System.Type[] supportHardwares)
+        public static void InitEvn(Evn evn)
         {
-            s_evn = System.Activator.CreateInstance(evnType) as BaseEvn;
+            if (_instance.evn == evn) return;
+
+            _instance.evn = evn;
+
+            switch (evn)
+            {
+                case Evn.Oculusvr:
+                    s_evn = new UnityOculusvrEvn();
+                    break;
+#if SUPPORT_STEAM_VR
+                case Evn.Steamvr:
+                    s_evn = new UnitySteamvrEvn(); 
+                    break;
+#endif
+                default:
+                    s_evn = new UnityOpenvrEvn();
+                    break;
+            }
             if (s_evn != null) {
                 GetInstance().StartCoroutine(LoadLibAsync((result)=> {
                     if(result) s_evn.Initlize(OnInputPluginInitlized);
-                    else OnInputPluginInitlized("InitEvn: 驱动加载失败 !");
+                    else OnInputPluginInitlized($"InitEvn [{evn}]: 驱动加载失败 !");
                 }));
             }
             else {
-                OnInputPluginInitlized("InitEvn: 环境对象创建失败 !");
+                OnInputPluginInitlized($"InitEvn [{evn}]: 环境对象创建失败 !");
             }
         }
 
@@ -252,7 +315,7 @@ namespace Nave.XR
             }
         }
 
-        internal static void OnXRNodeConnected(Metadata metadata)
+        internal static void OnHardwardConnected(Metadata metadata)
         {
             XRNode xRNode = XRNode.HardwareTracker;
             if (metadata.type == NodeType.Head)
@@ -267,7 +330,7 @@ namespace Nave.XR
             {
                 xRNode = XRNode.RightHand;
             }
-            else if (metadata.type == NodeType.PeliveTrack)
+            else if (metadata.type == NodeType.Pelive)
             {
 
             }
@@ -280,11 +343,11 @@ namespace Nave.XR
 
             }
 
-            Log($" onDeviceConnected... [type = {metadata.type}，name = {metadata.name}]");
+            Log($" onHardwardConnected... [type = {metadata.type}，name = {metadata.name}]");
             onDeviceConnected?.Invoke(xRNode, metadata.name);
 
             //查找未匹配的设备列表
-            var devices = captures.Where((d) => !d.isTracked && d.NodeType == metadata.type);
+            var devices = s_Hardwares.Where((d) => !d.isTracked && d.NodeType == metadata.type);
             if (devices != null && devices.Count() > 0) {
                 foreach (var device in devices) device.Connected(metadata);
             }
@@ -292,7 +355,7 @@ namespace Nave.XR
             checkTouchPad();
         }
 
-        internal static void OnXRNodeDisconnected(Metadata metadata)
+        internal static void OnHardwardDisconnected(Metadata metadata)
         {
             XRNode xRNode = XRNode.HardwareTracker;
             if (metadata.type == NodeType.Head)
@@ -307,7 +370,7 @@ namespace Nave.XR
             {
                 xRNode = XRNode.RightHand;
             }
-            else if (metadata.type == NodeType.PeliveTrack)
+            else if (metadata.type == NodeType.Pelive)
             {
 
             }
@@ -321,10 +384,10 @@ namespace Nave.XR
             }
 
             onDeviceDisconnected?.Invoke(xRNode, metadata.name);
-            Log($" onDeviceDisconnected... [type = {xRNode}，name = {metadata.name}]");
+            Log($" onHardwardDisconnected... [type = {xRNode}，name = {metadata.name}]");
 
             //查找已匹配的设备列表
-            var devices = captures.Where((d) => d.UniqueId == metadata.uniqueID && d.NodeType == metadata.type);
+            var devices = s_Hardwares.Where((d) => d.UniqueId == metadata.uniqueID && d.NodeType == metadata.type);
             if (devices != null && devices.Count() > 0) {
                 foreach (var device in devices) device.Disconnected();
             }
@@ -334,65 +397,35 @@ namespace Nave.XR
 
 #endregion
 
-        #region XRDevice Objects
+        #region Hardware Listeners
 
-        static List<XRDeviceObject> captures = new List<XRDeviceObject>();
+        static List<HardwareListener> s_Hardwares = new List<HardwareListener>();
 
-        public static XRDeviceObject GeDeviceCapture(NodeType nodeType)
+        /// <summary>
+        /// 注册一个虚拟设备
+        /// </summary>
+        internal static void RegistHardware(HardwareListener hardware)
         {
-            if (captures != null && captures.Count > 0)
-            {
-                for (int i = 0; i < captures.Count; i++)
-                {
-                    if (captures[i].isTracked && captures[i].NodeType == nodeType)
-                    {
-                        return captures[i];
-                    }
-                }
-            }
-            return null;
+            s_Hardwares.Add(hardware);
+            Metadata metadata = default(Metadata);
+            if (hardware.NodeType == NodeType.Head) metadata = headMeta;
+            else if (hardware.NodeType == NodeType.LeftHand) metadata = leftHandMeta;
+            else if (hardware.NodeType == NodeType.RightHand) metadata = rightHandMeta;
+            else if (hardware.NodeType == NodeType.Pelive) metadata = pelivMeta;
+            else if (hardware.NodeType == NodeType.LeftFoot) metadata = leftFootMeta;
+            else if (hardware.NodeType == NodeType.RightFoot) metadata = rightFootMeta;
+            if (metadata != null && metadata.uniqueID > 0) hardware.Connected(metadata);
         }
 
-        internal static void RegistDevice(XRDeviceObject controller)
+        /// <summary>
+        /// 注销一个虚拟设备
+        /// </summary>
+        internal static void UnregistHardware(HardwareListener hardware)
         {
-            captures.Add(controller);
-            Metadata xRNodeUsage = default(Metadata);
-            if (controller.NodeType == NodeType.Head) xRNodeUsage = headMeta;
-            else if (controller.NodeType == NodeType.LeftHand) xRNodeUsage = leftHandMeta;
-            else if (controller.NodeType == NodeType.RightHand) xRNodeUsage = rightHandMeta;
-            else if (controller.NodeType == NodeType.PeliveTrack) xRNodeUsage = pelivMeta;
-            else if (controller.NodeType == NodeType.LeftFoot) xRNodeUsage = leftFootMeta;
-            else if (controller.NodeType == NodeType.RightFoot) xRNodeUsage = rightFootMeta;
-            if (xRNodeUsage != null && xRNodeUsage.uniqueID > 0) controller.Connected(xRNodeUsage);
+            s_Hardwares.Remove(hardware);
+            hardware.Disconnected();
         }
 
-        internal static void UnregistDevice(XRDeviceObject controller)
-        {
-            captures.Remove(controller);
-            controller.Disconnected();
-        }
-
-        private static void UpdateInputDeviceAndNodeStatess()
-        {
-            for (int i = captures.Count - 1; i >= 0; i--)
-            {
-                var device = captures[i];
-                if (!device.isActiveAndEnabled) continue;
-                if (device.NodeType == NodeType.Head)
-                    device.UpdateInputDeviceAndXRNode(headMeta);
-                else if (device.NodeType == NodeType.LeftHand)
-                    device.UpdateInputDeviceAndXRNode(leftHandMeta);
-                else if (device.NodeType == NodeType.RightHand)
-                    device.UpdateInputDeviceAndXRNode(rightHandMeta);
-                else if (device.NodeType == NodeType.PeliveTrack)
-                    device.UpdateInputDeviceAndXRNode(pelivMeta);
-                else if (device.NodeType == NodeType.LeftFoot)
-                    device.UpdateInputDeviceAndXRNode(leftFootMeta);
-                else if (device.NodeType == NodeType.RightFoot)
-                    device.UpdateInputDeviceAndXRNode(rightFootMeta);
-            }
-        }
-
-#endregion
+        #endregion
     }
 }

@@ -54,6 +54,19 @@ namespace Nave.XR
             ["WindowsMR"] = "VRHandles/wmr",
         };
 
+        public static Hardware Show(HardwareListener listener)
+        {
+            var meta = NaveXR.GetMetaDara(listener.NodeType);
+
+
+            return null;
+        }
+
+        public static void Hide(Hardware hardware)
+        {
+            
+        }
+
         //追踪器
         public const string OpenVR_HtcVive_Tracker = "VIVE Tracker";
 
@@ -67,6 +80,7 @@ namespace Nave.XR
         };
 
         static List<SupportXRControlerInfo> S_SupportXRControlerInfos;
+
         static string S_DefaultHandRes = "OculusTouchForQuestAndRiftS";
 
         /// <summary>

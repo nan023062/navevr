@@ -40,7 +40,7 @@ namespace Nave.XR
             xRNodeStates.Clear();
 
             //TODO: 实现驱动加载和初始化
-            XRDevice.GetInstance().StartCoroutine(InitEvnAsync((error)=> {
+            NaveXR.GetInstance().StartCoroutine(InitEvnAsync((error)=> {
                 valid = string.IsNullOrEmpty(error);
                 onResult?.Invoke(error);
             }));
@@ -48,58 +48,67 @@ namespace Nave.XR
 
         protected abstract IEnumerator InitEvnAsync(System.Action<string> onResult);
 
-        internal virtual void Update() { }
-
         internal virtual void Release()
         {
             xRNodeStates.Clear();
         }
 
-        internal virtual void CheckDeviceRemovedOrAdded()
+        internal void UpdateAllControllerState()
+        {
+            if (!valid) return;
+
+            //检测连接情况
+            CheckDeviceRemovedOrAdded();
+
+            //Update
+            UpdateInputDeviceStates();
+        }
+
+        private void CheckDeviceRemovedOrAdded()
         {
             xRNodeStates.Clear();
             InputTracking.GetNodeStates(xRNodeStates);
 
-            TryCheckNodeState(XRDevice.headMeta, XRNode.Head);
-            TryCheckNodeState(XRDevice.leftHandMeta, XRNode.LeftHand);
-            TryCheckNodeState(XRDevice.rightHandMeta, XRNode.RightHand);
+            TryCheckNodeState(NaveXR.headMeta, XRNode.Head);
+            TryCheckNodeState(NaveXR.leftHandMeta, XRNode.LeftHand);
+            TryCheckNodeState(NaveXR.rightHandMeta, XRNode.RightHand);
 
-            TryCheckTrackNodeState(XRDevice.pelivMeta, XRNode.HardwareTracker);
-            TryCheckTrackNodeState(XRDevice.leftFootMeta, XRNode.HardwareTracker);
-            TryCheckTrackNodeState(XRDevice.rightFootMeta, XRNode.HardwareTracker);
+            TryCheckTrackNodeState(NaveXR.pelivMeta, XRNode.HardwareTracker);
+            TryCheckTrackNodeState(NaveXR.leftFootMeta, XRNode.HardwareTracker);
+            TryCheckTrackNodeState(NaveXR.rightFootMeta, XRNode.HardwareTracker);
         }
 
-        internal void UpdateInputDeviceStates()
+        private void UpdateInputDeviceStates()
         {
             for (int i = xRNodeStates.Count - 1; i >= 0; i--) {
                 var nodeState = xRNodeStates[i];
-                if (nodeState.uniqueID == XRDevice.headMeta.uniqueID) {
-                    FillPoseMetadata(XRDevice.headMeta, ref nodeState);
+                if (nodeState.uniqueID == NaveXR.headMeta.uniqueID) {
+                    FillPoseMetadata(NaveXR.headMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.pelivMeta.uniqueID) {
-                    FillPoseMetadata(XRDevice.pelivMeta, ref nodeState);
+                else if (nodeState.uniqueID == NaveXR.pelivMeta.uniqueID) {
+                    FillPoseMetadata(NaveXR.pelivMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.leftFootMeta.uniqueID) {
-                    FillPoseMetadata(XRDevice.leftFootMeta, ref nodeState);
+                else if (nodeState.uniqueID == NaveXR.leftFootMeta.uniqueID) {
+                    FillPoseMetadata(NaveXR.leftFootMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.rightFootMeta.uniqueID) {
-                    FillPoseMetadata(XRDevice.rightFootMeta, ref nodeState);
+                else if (nodeState.uniqueID == NaveXR.rightFootMeta.uniqueID) {
+                    FillPoseMetadata(NaveXR.rightFootMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.leftHandMeta.uniqueID) {
-                    FillMetadata(XRDevice.leftHandMeta, ref nodeState);
+                else if (nodeState.uniqueID == NaveXR.leftHandMeta.uniqueID) {
+                    FillMetadata(NaveXR.leftHandMeta, ref nodeState);
                 }
-                else if (nodeState.uniqueID == XRDevice.rightHandMeta.uniqueID) {
-                    FillMetadata(XRDevice.rightHandMeta, ref nodeState);
+                else if (nodeState.uniqueID == NaveXR.rightHandMeta.uniqueID) {
+                    FillMetadata(NaveXR.rightHandMeta, ref nodeState);
                 }
             }
         }
 
         protected abstract void FillMetadata(HandMetadata hand, ref XRNodeState xRNode);
 
-        protected void FillPoseMetadata(Metadata hardware, ref XRNodeState xRNode)
+        protected void FillPoseMetadata(Metadata metadata, ref XRNodeState xRNode)
         {
-            xRNode.TryGetPosition(out hardware.position);
-            xRNode.TryGetRotation(out hardware.rotation);
+            xRNode.TryGetPosition(out metadata.position);
+            xRNode.TryGetRotation(out metadata.rotation);
         }
 
         private void TryCheckNodeState(Metadata metadata, XRNode xRNode)
@@ -125,9 +134,9 @@ namespace Nave.XR
         private void TryCheckTrackNodeState(Metadata metadata, XRNode xRNode)
         {
             XRNodeState xRNodeState = default(XRNodeState);
-            var pelvis = XRDevice.pelivMeta;
-            var lfoot = XRDevice.leftFootMeta;
-            var rfoot = XRDevice.rightFootMeta;
+            var pelvis = NaveXR.pelivMeta;
+            var lfoot = NaveXR.leftFootMeta;
+            var rfoot = NaveXR.rightFootMeta;
 
             for (int i = xRNodeStates.Count - 1; i >= 0; i--) {
                 var nodeState = xRNodeStates[i];
@@ -159,13 +168,13 @@ namespace Nave.XR
             if (metadata == null || metadata.isValid) return;
             InputDevice inputDevice = U3DInputDevices.GetDeviceAtXRNode(xRNodeState.nodeType);
             metadata.Connected(xRNodeState.uniqueID, inputDevice.name);
-            XRDevice.OnXRNodeConnected(metadata);
+            NaveXR.OnHardwardConnected(metadata);
         }
 
         private void InputTracking_nodeRemoved(Metadata metadata)
         {
             if (metadata == null || !metadata.isValid) return;
-            XRDevice.OnXRNodeDisconnected(metadata);
+            NaveXR.OnHardwardDisconnected(metadata);
             metadata.Disconnect();
         }
     }

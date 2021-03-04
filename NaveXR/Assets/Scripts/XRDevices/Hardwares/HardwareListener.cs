@@ -5,16 +5,21 @@ using System;
 
 namespace Nave.XR
 {
-    public class XRDeviceObject : MonoBehaviour
+    public class HardwareListener : MonoBehaviour
     {
         private void Awake()
         {
-            XRDevice.RegistDevice(this);
+            NaveXR.RegistHardware(this);
+        }
+
+        private void Update()
+        {
+            UpdatePoseAndController();
         }
 
         private void OnDestroy()
         {
-            XRDevice.UnregistDevice(this);
+            NaveXR.UnregistHardware(this);
         }
 
         #region Draw Gizmos
@@ -62,44 +67,51 @@ namespace Nave.XR
 
         #region InputDevice & XRNodeState
 
-        [Header("InputDevice & XRNodeState")]
+        [SerializeField] NodeType m_nodeType = NodeType.Head;
+
         [NotModify, SerializeField] private ulong m_UniqueId;
 
         [NotModify, SerializeField] private string m_DeviceName;
 
-        [SerializeField] private NodeType nodeType = NodeType.Head;
+        [SerializeField] private Hardware m_controller;
+
         public ulong UniqueId { get { return m_UniqueId; } }
-        public NodeType NodeType { get { return nodeType; } }
+        public NodeType NodeType => m_nodeType;
         public bool isTracked { get { return m_UniqueId > 0; } }
         public string device { get { return m_DeviceName; } }
 
         internal void Connected(Metadata metadata)
         {
             m_UniqueId = metadata.uniqueID;
-            m_DeviceName = metadata.name;
-            UpdateInputDeviceAndXRNode(metadata);
-            XRDevice.Log($"Virtual Device Connected : nodeType={nodeType},id={m_UniqueId},device={m_DeviceName}!");
-            InitHandOffset();
-            OnConnected();
-        }
 
-        public virtual void OnConnected() { }
+            m_DeviceName = metadata.name;
+
+            UpdatePoseAndController();
+
+            NaveXR.Log($"{GetType().FullName} Connected : nodeType={NodeType},id={m_UniqueId},device={m_DeviceName}!");
+
+            //显示虚拟设备
+            Hardwares.Hide(m_controller);
+            m_controller = Hardwares.Show(this);
+        }
 
         internal void Disconnected()
         {
-            XRDevice.Log($"Virtual Device Disconnect : nodeType={nodeType},id={m_UniqueId}!");
+            //隐藏虚拟设备
+            Hardwares.Hide(m_controller);
+
+            NaveXR.Log($"{GetType().FullName} Disconnect : nodeType={NodeType},id={m_UniqueId}!");
+
             m_UniqueId = 0;
+
             m_DeviceName = string.Empty;
-            OnDisconnected();
         }
 
-        public virtual void OnDisconnected() { }
-
-        //使用ref關鍵字 防止數據拷貝
-        internal void UpdateInputDeviceAndXRNode(Metadata xRNodeUsage)
+        internal void UpdatePoseAndController()
         {
-            transform.localRotation = xRNodeUsage.rotation;
-            transform.localPosition = xRNodeUsage.position;
+            var metadata = NaveXR.GetMetaDara(NodeType);
+            transform.localRotation = metadata.rotation;
+            transform.localPosition = metadata.position;
         }
 
         #endregion
@@ -144,22 +156,12 @@ namespace Nave.XR
             }
         }
 
-        /// <summary>
-        /// 设置Input数据的校准参数
-        /// </summary>
-        /// <param name="position">位置偏移</param>
-        /// <param name="rotation">旋转偏移</param>
         public void SetInputOffset(Vector3 position, Quaternion rotation)
         {
             m_InputOffset.position = position;
             m_InputOffset.rotation = rotation;
         }
 
-        /// <summary>
-        /// 设置Input数据的校准参数
-        /// </summary>
-        /// <param name="anchor">持物点参照物</param>
-        /// <param name="target">设备点参照物</param>
         public void SetInputOffset(Transform anchor, Transform target)
         {
             m_InputOffset.position = anchor.InverseTransformDirection(target.position - anchor.position);
@@ -180,19 +182,18 @@ namespace Nave.XR
             Vector3 positionOff = Vector3.zero;
             Quaternion rotationOff = Quaternion.identity;
 
-            if (nodeType == NodeType.LeftHand)
+            if (NodeType == NodeType.LeftHand)
             {
-                XRDevice.GetHandInputOffset(true, out positionOff, out rotationOff);
+                NaveXR.GetHandInputOffset(true, out positionOff, out rotationOff);
                 SetInputOffset(positionOff, rotationOff);
             }
-            else if (nodeType == NodeType.RightHand)
+            else if (NodeType == NodeType.RightHand)
             {
-                XRDevice.GetHandInputOffset(false, out positionOff, out rotationOff);
+                NaveXR.GetHandInputOffset(false, out positionOff, out rotationOff);
                 SetInputOffset(positionOff, rotationOff);
             }
         }
 
         #endregion
-
     }
 }

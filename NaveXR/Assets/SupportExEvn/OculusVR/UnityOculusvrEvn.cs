@@ -7,12 +7,12 @@ using U3DInputDevices = UnityEngine.XR.InputDevices;
 
 namespace Nave.XR
 {
-    [XREnv(name="UnityOculus",lib = XRLib.Oculus)]
-    internal class UnityOculusEvn : Nave.XR.BaseEvn
+    [XREnv(name="UnityOculusvr",lib = XRLib.Oculus)]
+    internal class UnityOculusvrEvn : Nave.XR.BaseEvn
     {
         protected override IEnumerator InitEvnAsync(Action<string> onResult)
         {
-            XRDevice.GetInstance().gameObject.AddComponent<OVRManager>();
+            NaveXR.GetInstance().gameObject.AddComponent<OVRManager>();
             float duration = 5f;
             while (duration > 0f) {
                 if (OVRManager.OVRManagerinitialized) {

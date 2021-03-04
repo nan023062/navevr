@@ -8,7 +8,7 @@ namespace Assets.Samples
     /// 测试 人形数据校准处理算法
     /// </summary>
     [Serializable]
-    public class HumanoidCalibrateProc : IMatedataProcessor
+    public class HumanoidCalibrateProc : MonoBehaviour, IMatedataProcessor
     {
         public bool run = false;
 

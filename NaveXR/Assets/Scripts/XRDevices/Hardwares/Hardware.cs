@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
-using UnityEngine.XR;
-using System.Collections.Generic;
-using System;
 
 namespace Nave.XR
 {
-    public abstract class Hardware : XRDeviceObject
+    public abstract class Hardware : MonoBehaviour
     {
-        #region Abstract Methods
+        public void Update()
+        {
+            OnUpdate();
+        }
 
-        public abstract void SetVisiable(bool visiable);
-        
-        #endregion
+        protected abstract void OnUpdate();
     }
 }

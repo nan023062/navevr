@@ -52,7 +52,7 @@ namespace Nave.XR
                 }
         
                 if (mTouched){
-                    if (keyCode == KeyCode.TouchMiddle || XRDevice.isTouchPad){
+                    if (keyCode == KeyCode.TouchMiddle || NaveXR.isTouchPad){
                         mPressed = handUsage.primary2DAxisPressed;
                     }
                     else{

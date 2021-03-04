@@ -71,13 +71,13 @@ namespace Nave.XR
         //注册事件
         protected override void OnEnable()
         {
-            XRDevice.Regist(this);
+            NaveXR.Regist(this);
         }
 
         //注销事件
         protected override void OnDisable()
         {
-            XRDevice.Remove(this);
+            NaveXR.Remove(this);
         }
 
         protected override void UpdateHitState(ref RaycastResult raycast)

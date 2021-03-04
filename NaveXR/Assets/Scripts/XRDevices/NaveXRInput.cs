@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Nave.XR
 {
-    public partial class XRDevice : MonoBehaviour
+    public partial class NaveXR : MonoBehaviour
     {
         Dictionary<int, HandInputBase[]> mXRHandInputs;
 
@@ -32,7 +32,10 @@ namespace Nave.XR
             if (headInputEye == null) headInputEye = new HeadInputEye();
         }
 
-        private void UpdateInputStates()
+        /// <summary>
+        /// 标准化的数据状态数据
+        /// </summary>
+        private void UpdateStandardInputState()
         {
 #if UNITY_EDITOR
             TestXRInputUsages();
@@ -263,8 +266,8 @@ namespace Nave.XR
 
         private void TestXRInputUsages()
         {
-            leftHand = XRDevice.leftHandMeta;
-            rightHand = XRDevice.rightHandMeta;
+            leftHand = NaveXR.leftHandMeta;
+            rightHand = NaveXR.rightHandMeta;
 
             //var trigger = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(left ? XRNode.LeftHand : XRNode.RightHand);
 

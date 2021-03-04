@@ -28,6 +28,10 @@ namespace Nave.XR
 
         public InputType inputType = InputType.Mouse;
 
+        [SerializeField, Header("射线")] private GameObject m_Line;
+
+        [SerializeField, Header("Hit")] private GameObject m_Hit;
+
         protected override void Awake()
         {
             fingerId = s_fingerId++;
@@ -48,51 +52,46 @@ namespace Nave.XR
 
         protected override void Start()
         {
-            PrepareLaserRenderer();
+
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            XRDevice.Regist(this);
+            NaveXR.Regist(this);
         }
 
         protected override void OnDisable()
         {
-            XRDevice.Remove(this);
+            NaveXR.Remove(this);
             base.OnDisable();
         }
 
         protected override void UpdateHitState(ref RaycastResult raycast)
         {
             isHit = raycast.gameObject != null;
-            if (isHit)
-            {
+            if (isHit) {
                 Vector3 lastHitPoint = hitPoint;
 
                 //左手按鍵狀態
-                if (inputType == InputType.LeftHand)
-                {
-                    Vector2 aixs = XRDevice.GetTouchAxis(0);
+                if (inputType == InputType.LeftHand) {
+                    Vector2 aixs = NaveXR.GetTouchAxis(0);
                     if (aixs.sqrMagnitude > scrollThrelod)
                         scrollDelta = aixs * handScrollSensitivity;
                 }
                 //右手按鍵狀態
-                else if (inputType == InputType.RightHand)
-                {
-                    Vector2 aixs = XRDevice.GetTouchAxis(1);
+                else if (inputType == InputType.RightHand) {
+                    Vector2 aixs = NaveXR.GetTouchAxis(1);
                     if (aixs.sqrMagnitude > scrollThrelod)
                         scrollDelta = aixs * handScrollSensitivity;
                 }
                 //Unity原生模式狀態
-                else if (inputType == InputType.Mouse)
-                {
+                else if (inputType == InputType.Mouse) {
 #if UNITY_STANDALONE || UNITY_EDITOR
                     scrollDelta = Input.mouseScrollDelta;
 
 #elif UNITY_ANDROID || UNITY_IOS
-                    if (Input.touchCount > 0)
-                    {
+                    if (Input.touchCount > 0) {
                         Touch touch = Input.GetTouch(0);
                         delta = touch.deltaPosition;
                     }                
@@ -105,7 +104,8 @@ namespace Nave.XR
                 Vector3 moveDelta = hitPoint - lastHitPoint;
                 delta = moveDelta - Vector3.Project(moveDelta, hitNormal);
             }
-            UpdateLaserRenderer();
+
+            UpdateRenderer();
         }
 
         protected override void UpdatePressedAndReleased(ref RaycastResult raycast)
@@ -113,14 +113,14 @@ namespace Nave.XR
             //左手按鍵狀態
             if (inputType == InputType.LeftHand)
             {
-                isPressed = XRDevice.IsLeftKeyDown(KeyCode.Trigger);
-                isReleased = XRDevice.IsLeftKeyUp(KeyCode.Trigger);
+                isPressed = NaveXR.IsLeftKeyDown(KeyCode.Trigger);
+                isReleased = NaveXR.IsLeftKeyUp(KeyCode.Trigger);
             }
             //右手按鍵狀態
             else if (inputType == InputType.RightHand)
             {
-                isPressed = XRDevice.IsRightKeyDown(KeyCode.Trigger);
-                isReleased = XRDevice.IsRightKeyUp(KeyCode.Trigger);
+                isPressed = NaveXR.IsRightKeyDown(KeyCode.Trigger);
+                isReleased = NaveXR.IsRightKeyUp(KeyCode.Trigger);
             }
             //Unity原生模式狀態
             else if (inputType == InputType.Mouse)
@@ -140,68 +140,24 @@ namespace Nave.XR
             }
         }
 
-#region Laser  Renderer
-
-        [SerializeField] private float m_LineSize = 0.04f;
-        [SerializeField] private float m_HitSize = 0.04f;
-        private GameObject m_Line = null;
-        private GameObject m_Hit = null;
-        private Material m_LineMaterial = null;
-        private bool m_showLine = false;
-
-        public bool isVisiable { get { return m_showLine; } }
-
         public void SetVisiable(bool visiable) {
 
-            if (m_showLine == visiable) return;
-            m_showLine = visiable;
-            m_Line?.SetActive(m_showLine);
-            m_Hit?.SetActive(m_showLine && isHit);
+            gameObject.SetActive(visiable);
         }
 
-        private void PrepareLaserRenderer()
+        private void UpdateRenderer()
         {
+            if (!isActiveAndEnabled) return;
             if (inputType == InputType.Mouse) return;
-
-            //当前项目资源加载
-            //var lineScaleAsset = OasisAsset.Task("builtinres/laserpointer/LineScale").Get<GameObject>();
-            //if (lineScaleAsset)
-            //{
-            //    m_Line = GoTools.NewChild(gameObject, lineScaleAsset).transform.gameObject;
-            //    m_Line.SetLayerRecursively(LayerMask.NameToLayer("UI"));
-            //    LineRenderer lineRenderer = GetComponentInChildren<LineRenderer>();
-            //    m_LineMaterial = lineRenderer?.material;
-            //    m_Line.SetActive(m_showLine);
-            //}
-
-            //var lineHitAsset = OasisAsset.Task("builtinres/laserpointer/LineHit").Get<GameObject>();
-            //if (lineHitAsset)
-            //{
-            //    m_Hit = GoTools.NewChild(gameObject, lineHitAsset).transform.gameObject;
-            //    m_Hit.SetLayerRecursively(LayerMask.NameToLayer("UI"));
-            //    m_Hit.SetActive(m_showLine && isHit);
-            //}
-        }
-
-        private void UpdateLaserRenderer()
-        {
-            if (inputType == InputType.Mouse) return;
-            if (!m_showLine) return;
-            if (m_Line == null || m_Hit == null) return;
 
             float distance = isHit ? Vector3.Distance(hitPoint, transform.position) : displayDistance;
 
-            Vector3 lineScale = new Vector3(m_LineSize, m_LineSize, distance);
+            Vector3 lineScale = m_Line.transform.localScale;
+            lineScale.z = distance;
             m_Line.transform.localScale = lineScale;
-            float lerp = 1f - Mathf.Clamp01((distance - 1f) / 5f);
-            m_LineMaterial?.SetFloat("_Emission", Mathf.Lerp(2f, 5f, lerp));
 
-            if(m_Hit.activeSelf != isHit) m_Hit.SetActive(isHit);
-            lerp = Mathf.Clamp01((distance - 0.5f) / 4f);
-            m_Hit.transform.localScale = Vector3.one * m_HitSize * Mathf.Lerp(0.2f, 1f, lerp);
+            if (isHit != m_Hit.activeSelf) m_Hit.SetActive(isHit);
             m_Hit.transform.localPosition = new Vector3(0, 0, distance);
         }
-
-#endregion
     }
 }

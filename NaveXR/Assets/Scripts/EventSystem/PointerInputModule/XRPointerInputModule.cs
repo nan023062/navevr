@@ -27,7 +27,7 @@ namespace Nave.XR
 
         public override bool IsModuleSupported()
         {
-            return XRDevice.isEnabled || base.IsModuleSupported();
+            return NaveXR.isEnabled || base.IsModuleSupported();
         }
 
         private bool ShouldIgnoreEventsOnNoFocus()
@@ -49,7 +49,7 @@ namespace Nave.XR
 
         public override void Process()
         {
-            if ((!XRDevice.isFocus && !eventSystem.isFocused) && ShouldIgnoreEventsOnNoFocus()) return;
+            if ((!NaveXR.isFocus && !eventSystem.isFocused) && ShouldIgnoreEventsOnNoFocus()) return;
 
             bool usedEvent = SendUpdateEventToSelectedObject();
 
@@ -135,7 +135,7 @@ namespace Nave.XR
         {
             bool result = false;
 
-            var fingers = XRDevice.GetFingers();
+            var fingers = NaveXR.GetFingers();
             int length = fingers.Count;
             for (int i = 0; !result && i < length; i++)
             {
@@ -228,7 +228,7 @@ namespace Nave.XR
         {
             bool result = false;
 
-            var lasers = XRDevice.GetLasers();
+            var lasers = NaveXR.GetLasers();
             int length = lasers.Count;
             for (int i = 0; i < length; i++)
             {

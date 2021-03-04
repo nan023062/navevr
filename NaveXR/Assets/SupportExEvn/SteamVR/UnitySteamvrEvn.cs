@@ -9,7 +9,7 @@ using Valve.VR;
 namespace Nave.XR
 {
     [XREnv(name="UnitySteamvr",lib = XRLib.OpenVR)]
-    internal class UnitySteamvrEvn : Nave.XR.BaseXREvn
+    internal class UnitySteamvrEvn : Nave.XR.BaseEvn
     {
         protected override IEnumerator InitEvnAsync(Action<string> onResult)
         {

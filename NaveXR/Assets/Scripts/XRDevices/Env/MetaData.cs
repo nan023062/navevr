@@ -18,7 +18,7 @@ namespace Nave.XR
         Head = 1,
         LeftHand = 2,
         RightHand = 3,
-        PeliveTrack = 4,
+        Pelive = 4,
         LeftFoot = 5,
         RightFoot = 6,
     }
