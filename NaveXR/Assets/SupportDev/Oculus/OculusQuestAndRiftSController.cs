@@ -9,10 +9,18 @@ namespace Nave.VR
     [XRHardware()]
     public class OculusQuestAndRiftsController : Controller
     {
+        protected override void OnDeviceConnected()
+        {
+
+        }
+
+        protected override void OnDeviceDisConnected()
+        {
+
+        }
 
         protected override void OnUpdate()
         {
-            base.OnUpdate();
 
 
         }

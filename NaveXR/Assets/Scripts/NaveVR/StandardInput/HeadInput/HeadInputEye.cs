@@ -16,7 +16,7 @@ namespace Nave.VR
         {
         }
 
-        internal override void UpdateState(Metadata xRNodeUsage)
+        internal override void UpdateState(TrackingAnchor xRNodeUsage)
         {
 
         }

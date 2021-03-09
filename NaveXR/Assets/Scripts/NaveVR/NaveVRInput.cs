@@ -41,10 +41,10 @@ namespace Nave.VR
             TestXRInputUsages();
 #endif
             foreach (var inputs in m_Inputs.Values){
-                if (leftHandMeta.isValid) inputs[0].UpdateState(leftHandMeta);
-                if (rightHandMeta.isValid) inputs[1].UpdateState(rightHandMeta);
+                if (leftHandAnchor.connected) inputs[0].UpdateState(leftHandAnchor);
+                if (rightHandAnchor.connected) inputs[1].UpdateState(rightHandAnchor);
             }
-            if (headMeta.isValid) headInputEye.UpdateState(headMeta);
+            if (headAnchor.connected) headInputEye.UpdateState(headAnchor);
         }
 
         private void ClearInputs() { m_Inputs?.Clear(); }
@@ -230,14 +230,14 @@ namespace Nave.VR
 
 #if UNITY_EDITOR
 
-        [SerializeField] private HandMetadata leftHand;
+        [SerializeField] private HandAnchor leftHand;
 
-        [SerializeField] private HandMetadata rightHand;
+        [SerializeField] private HandAnchor rightHand;
 
         private void TestXRInputUsages()
         {
-            leftHand = NaveVR.leftHandMeta;
-            rightHand = NaveVR.rightHandMeta;
+            leftHand = NaveVR.leftHandAnchor;
+            rightHand = NaveVR.rightHandAnchor;
         }
 #endif
         

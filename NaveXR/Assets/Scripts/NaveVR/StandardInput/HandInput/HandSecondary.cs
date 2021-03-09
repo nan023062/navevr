@@ -9,9 +9,9 @@ namespace Nave.VR
         }
 
         //当前按钮 只有点击事件
-        internal override void UpdateState(Metadata xRNodeUsage)
+        internal override void UpdateState(TrackingAnchor xRNodeUsage)
         {
-            HandMetadata handUsage = xRNodeUsage as HandMetadata;
+            HandAnchor handUsage = xRNodeUsage as HandAnchor;
 
             bool lastPressed = mPressed;
             mPressed = handUsage.secondaryPressed;

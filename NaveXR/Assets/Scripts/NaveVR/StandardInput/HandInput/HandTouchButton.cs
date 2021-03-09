@@ -17,9 +17,9 @@ namespace Nave.VR
 
         }
 
-        internal override void UpdateState(Metadata xRNodeUsage)
+        internal override void UpdateState(TrackingAnchor xRNodeUsage)
         {
-            HandMetadata handUsage = xRNodeUsage as HandMetadata;
+            HandAnchor handUsage = xRNodeUsage as HandAnchor;
             mTouched = handUsage.primary2DAxisTouch;
             mKeyForce = 0f;
             bool lastPressed = mPressed;

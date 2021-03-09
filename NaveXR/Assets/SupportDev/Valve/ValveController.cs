@@ -11,9 +11,17 @@ namespace Nave.VR
     {
         protected override void OnUpdate()
         {
-            base.OnUpdate();
 
+        }
 
+        protected override void OnDeviceConnected()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OnDeviceDisConnected()
+        {
+            throw new NotImplementedException();
         }
 
     }

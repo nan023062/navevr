@@ -7,9 +7,7 @@ using System.Linq;
 
 namespace Nave.VR
 {
-    public delegate void XRDeviceDelegate(bool successed);
-
-    public delegate void XRDeviceNodeDelegate(XRNode nodeType, string deviceName);
+    public delegate void TrackingAnchorDelegate(XRNode nodeType, string deviceName);
 
     public class XRLib
     {
@@ -22,10 +20,10 @@ namespace Nave.VR
     {
         public static bool isEnabled
         {
-            get
-            {
+            get {
                 CheckSingleton();
-                return XRSettings.enabled && !string.IsNullOrEmpty(UnityEngine.XR.XRDevice.model) && !string.IsNullOrEmpty(XRSettings.loadedDeviceName);
+                return XRSettings.enabled && !string.IsNullOrEmpty(UnityEngine.XR.XRDevice.model) 
+                    && !string.IsNullOrEmpty(XRSettings.loadedDeviceName);
             }
         }
 
@@ -40,7 +38,7 @@ namespace Nave.VR
 
         private static void checkTouchPad()
         {
-            isTouchPad = leftHandMeta.isPad || rightHandMeta.isPad;
+            isTouchPad = leftHandAnchor.isPad || rightHandAnchor.isPad;
         }
 
         public static bool isFocus {
@@ -94,8 +92,7 @@ namespace Nave.VR
 
         private static void CheckSingleton()
         {
-            if(_instance == null)
-            {
+            if(_instance == null) {
                 var go = new GameObject("[NaveVR]", typeof(NaveVR));
                 GameObject.DontDestroyOnLoad(go);
                 go.hideFlags = HideFlags.NotEditable;
@@ -114,18 +111,19 @@ namespace Nave.VR
 
         private void OnEnable()
         {
-            UnityEngine.XR.XRDevice.SetTrackingSpaceType(TrackingSpaceType.RoomScale);
             UnityEngine.XR.XRDevice.deviceLoaded -= OnUnityXRDeviceLoaded;
+
             UnityEngine.XR.XRDevice.deviceLoaded += OnUnityXRDeviceLoaded;
+
             checkTouchPad();
         }
 
         private void Update()
         {
             //根据运行环境 读取源数据
-            s_evn?.UpdateAllControllerState();
+            s_trackingEvn?.UpdateTrackingSpaceData();
 
-            ProcMetaPose();
+            trackingSpace?.ProcessTrackingSpace();
 
             UpdateStandardInputState();
         }
@@ -138,8 +136,8 @@ namespace Nave.VR
         private void OnDestroy()
         {
             ClearInputs();
-            s_evn?.Release();
-            s_evn = null;
+            s_trackingEvn?.Release();
+            s_trackingEvn = null;
             _instance = null;
             Log("disposed !");
         }
@@ -154,120 +152,70 @@ namespace Nave.VR
 
         #endregion
 
-        #region Matedata
+        #region Tracking Anchors
 
-        internal static HeadMetadata headMeta = new HeadMetadata();
-
-        internal static HandMetadata leftHandMeta = new HandMetadata(NodeType.LeftHand);
-
-        internal static HandMetadata rightHandMeta = new HandMetadata(NodeType.RightHand);
-
-        internal static Metadata pelivMeta = new Metadata(NodeType.Head);
-
-        internal static Metadata leftFootMeta = new Metadata(NodeType.Head);
-
-        internal static Metadata rightFootMeta = new Metadata(NodeType.Head);
-
-        internal static IMatedataProcessor s_proc;
-
-        internal static Metadata GetMetaDara(NodeType nodeType)
+        internal static TrackingSpace trackingSpace { private set; get; }
+        internal static HeadAnchor headAnchor => trackingSpace?.headAnchor;
+        internal static HandAnchor leftHandAnchor => trackingSpace?.leftHandAnchor;
+        internal static HandAnchor rightHandAnchor => trackingSpace?.rightHandAnchor;
+        internal static TrackingAnchor pelivsAnchor => trackingSpace?.pelivsAnchor;
+        internal static TrackingAnchor leftFootAnchor => trackingSpace?.leftFootAnchor;
+        internal static TrackingAnchor rightFootAnchor => trackingSpace?.rightFootAnchor;
+        internal static TrackingAnchor GetAnchor(NodeType nodeType)
         {
             switch (nodeType)
             {
                 case NodeType.Head:
-                    return headMeta;
+                    return headAnchor;
                 case NodeType.LeftHand:
-                    return leftHandMeta;
+                    return leftHandAnchor;
                 case NodeType.RightHand:
-                    return rightHandMeta;
+                    return rightHandAnchor;
                 case NodeType.Pelive:
-                    return pelivMeta;
+                    return pelivsAnchor;
                 case NodeType.LeftFoot:
-                    return leftFootMeta;
+                    return leftFootAnchor;
                 case NodeType.RightFoot:
-                    return rightFootMeta;
+                    return rightFootAnchor;
                 default:
-                    return headMeta;
+                    return headAnchor;
             }
-        }
-
-        public static void SetMetadataProcessor(AbstractMetadataProcessor proc)
-        {
-            s_proc = proc;
-        }
-
-        private static void ProcMetaPose()
-        {
-            if (s_proc == null || !s_proc.Running()) return;
-
-            s_proc.PreProc();
-
-            var head = headMeta.GetPose();
-
-            var leftHand = leftHandMeta.GetPose();
-
-            var rightHand = rightHandMeta.GetPose();
-
-            var pelive = pelivMeta.GetPose();
-
-            var leftFoot = leftFootMeta.GetPose();
-
-            var rightFoot = rightFootMeta.GetPose();
-
-            s_proc.Proc(ref head, ref leftHand, ref rightHand, ref pelive, ref leftFoot, ref rightFoot);
-
-            headMeta.SetPose(head);
-
-            leftHandMeta.SetPose(leftHand);
-
-            rightHandMeta.SetPose(rightHand);
-
-            pelivMeta.SetPose(pelive);
-
-            leftFootMeta.SetPose(leftFoot);
-
-            rightFootMeta.SetPose(rightFoot);
-
-            s_proc.PostProc();
         }
 
         #endregion
 
-        #region Device Evn
+        #region Tracking Evn
 
-        private static BaseEvn s_evn;
-        
-        public static event XRDeviceNodeDelegate onDeviceConnected;
+        private static TrackingEvnBase s_trackingEvn;
 
-        public static event XRDeviceNodeDelegate onDeviceDisconnected;
+        public static event TrackingAnchorDelegate onTrackingAnchorConnected;
 
-        public static event XRDeviceDelegate onInputPluginInitlized;
+        public static event TrackingAnchorDelegate onTrackingAnchorDisconnected;
 
-        /// <summary>
-        /// 设置当前运行环境
-        /// </summary>
-        public static void InitEvn(System.Type evnType)
+        public static event System.Action<bool> onTrackingEvnInitlized;
+
+        public static void InitEvn(System.Type evnType, TrackingSpace trackSpace)
         {
-            if (s_evn != null) s_evn.Release();
-            s_evn = System.Activator.CreateInstance(evnType) as BaseEvn;
-            if (s_evn != null) {
+            if (s_trackingEvn != null) s_trackingEvn.Release();
+            s_trackingEvn = System.Activator.CreateInstance(evnType) as TrackingEvnBase;
+            trackingSpace = trackSpace;
+            if (s_trackingEvn != null) {
                 GetInstance().StartCoroutine(LoadLibAsync((result)=> {
-                    if(result) s_evn.Initlize(OnInputPluginInitlized);
-                    else OnInputPluginInitlized($"InitEvn [{evnType.FullName}]: 驱动加载失败 !");
+                    if(result) s_trackingEvn.Initlize(OnTrackingEvnInitlized);
+                    else OnTrackingEvnInitlized($"InitEvn [{evnType.FullName}]: 驱动加载失败 !");
                 }));
             }
             else {
-                OnInputPluginInitlized($"InitEvn [{evnType.FullName}]: 环境对象创建失败 !");
+                OnTrackingEvnInitlized($"InitEvn [{evnType.FullName}]: 环境对象创建失败 !");
             }
         }
-
 
         private static IEnumerator LoadLibAsync(System.Action<bool> onFinish)
         {
             yield return new WaitForEndOfFrame();
 
             XRSettings.enabled = true;
-            XRSettings.LoadDeviceByName(s_evn.lib);
+            XRSettings.LoadDeviceByName(s_trackingEvn.lib);
 
             yield return new WaitForEndOfFrame();
             XRSettings.enabled = true;
@@ -276,131 +224,85 @@ namespace Nave.VR
             onFinish?.Invoke(XRSettings.enabled);
         }
 
-        private static void OnInputPluginInitlized(string error)
+        private static void OnTrackingEvnInitlized(string error)
         {
             if (string.IsNullOrEmpty(error)) {
-                Log($" Successfully Init [{s_evn.name}] !");
+                Log($" Successfully Init [{s_trackingEvn.name}] !");
                 UnityEngine.XR.XRDevice.SetTrackingSpaceType(TrackingSpaceType.RoomScale);
-                XRInputSubsystem xRInput = new XRInputSubsystem();
-                onInputPluginInitlized?.Invoke(true);
+                onTrackingEvnInitlized?.Invoke(true);
             }
             else {
                 LogError($" Failed Init Evn  error: {error} !");
-                onInputPluginInitlized?.Invoke(false);
+                onTrackingEvnInitlized?.Invoke(false);
             }
         }
 
-        internal static void OnHardwardConnected(Metadata metadata)
+        internal static void OnTrackerConnected(TrackingAnchor anchor)
         {
             XRNode xRNode = XRNode.HardwareTracker;
-            if (metadata.type == NodeType.Head)
+            if (anchor.type == NodeType.Head)
             {
                 xRNode = XRNode.Head;
             }
-            else if (metadata.type == NodeType.LeftHand)
+            else if (anchor.type == NodeType.LeftHand)
             {
                 xRNode = XRNode.LeftHand;
             }
-            else if (metadata.type == NodeType.RightHand)
+            else if (anchor.type == NodeType.RightHand)
             {
                 xRNode = XRNode.RightHand;
             }
-            else if (metadata.type == NodeType.Pelive)
+            else if (anchor.type == NodeType.Pelive)
             {
 
             }
-            else if (metadata.type == NodeType.LeftFoot)
+            else if (anchor.type == NodeType.LeftFoot)
             {
 
             }
-            else if (metadata.type == NodeType.RightFoot)
+            else if (anchor.type == NodeType.RightFoot)
             {
 
             }
-
-            Log($" onHardwardConnected... [type = {metadata.type}，name = {metadata.name}]");
-            onDeviceConnected?.Invoke(xRNode, metadata.name);
-
-            //查找未匹配的设备列表
-            var devices = s_Hardwares.Where((d) => !d.isTracked && d.NodeType == metadata.type);
-            if (devices != null && devices.Count() > 0) {
-                foreach (var device in devices) device.Connected(metadata);
-            }
-
             checkTouchPad();
+
+            Log($" onTrackerConnected... [type = {anchor.type}，name = {anchor.name}]");
+            onTrackingAnchorConnected?.Invoke(xRNode, anchor.name);
         }
 
-        internal static void OnHardwardDisconnected(Metadata metadata)
+        internal static void OnTrackerDisconnected(TrackingAnchor anchor)
         {
             XRNode xRNode = XRNode.HardwareTracker;
-            if (metadata.type == NodeType.Head)
+            if (anchor.type == NodeType.Head)
             {
                 xRNode = XRNode.Head;
             }
-            else if (metadata.type == NodeType.LeftHand)
+            else if (anchor.type == NodeType.LeftHand)
             {
                 xRNode = XRNode.LeftHand;
             }
-            else if (metadata.type == NodeType.RightHand)
+            else if (anchor.type == NodeType.RightHand)
             {
                 xRNode = XRNode.RightHand;
             }
-            else if (metadata.type == NodeType.Pelive)
+            else if (anchor.type == NodeType.Pelive)
             {
 
             }
-            else if (metadata.type == NodeType.LeftFoot)
+            else if (anchor.type == NodeType.LeftFoot)
             {
 
             }
-            else if (metadata.type == NodeType.RightFoot)
+            else if (anchor.type == NodeType.RightFoot)
             {
 
             }
-
-            onDeviceDisconnected?.Invoke(xRNode, metadata.name);
-            Log($" onHardwardDisconnected... [type = {xRNode}，name = {metadata.name}]");
-
-            //查找已匹配的设备列表
-            var devices = s_Hardwares.Where((d) => d.UniqueId == metadata.uniqueID && d.NodeType == metadata.type);
-            if (devices != null && devices.Count() > 0) {
-                foreach (var device in devices) device.Disconnected();
-            }
-
             checkTouchPad();
+
+            onTrackingAnchorDisconnected?.Invoke(xRNode, anchor.name);
+            Log($" onTrackerDisconnected... [type = {xRNode}，name = {anchor.name}]");
         }
 
 #endregion
-
-        #region Hardware Listeners
-
-        static List<HardwareListener> s_Hardwares = new List<HardwareListener>();
-
-        /// <summary>
-        /// 注册一个虚拟设备
-        /// </summary>
-        internal static void RegistHardware(HardwareListener hardware)
-        {
-            s_Hardwares.Add(hardware);
-            Metadata metadata = default(Metadata);
-            if (hardware.NodeType == NodeType.Head) metadata = headMeta;
-            else if (hardware.NodeType == NodeType.LeftHand) metadata = leftHandMeta;
-            else if (hardware.NodeType == NodeType.RightHand) metadata = rightHandMeta;
-            else if (hardware.NodeType == NodeType.Pelive) metadata = pelivMeta;
-            else if (hardware.NodeType == NodeType.LeftFoot) metadata = leftFootMeta;
-            else if (hardware.NodeType == NodeType.RightFoot) metadata = rightFootMeta;
-            if (metadata != null && metadata.uniqueID > 0) hardware.Connected(metadata);
-        }
-
-        /// <summary>
-        /// 注销一个虚拟设备
-        /// </summary>
-        internal static void UnregistHardware(HardwareListener hardware)
-        {
-            s_Hardwares.Remove(hardware);
-            hardware.Disconnected();
-        }
-
-        #endregion
     }
 }

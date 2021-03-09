@@ -2,130 +2,80 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Nave.VR
 {
-    public enum SupportXRHardware
-    {
-        HTCVive,
-        OculusRift,
-        OculusCV1,
-        Knuckles,
-        WindowsMR,
-    }
-    
-    [Serializable]
-    public class SupportXRControlerInfo : ScriptableObject
-    {
-        public SupportXRHardware xRControler;
-        public string[] hardwardReadableNames;
-        public string assetBundleName;
-    }
-
     /// <summary>
     /// 支持的设备名称定义
     /// 不同驱动-名称不一样
     /// </summary>
-    internal static class Hardwares
+    internal class Hardwares : ScriptableObject
     {
-        //头盔
-        public const string Hmd_HTCVive = "";
-        public const string Hmd_HTCCosmas = "";
-        public const string Hmd_OculusRiftS = "";
-        public const string Hmd_OculusQuest = "";
-        public const string Hmd_ValveIndex = "";
+#if UNITY_EDITOR
 
-        //手柄
-        public const string OpenVR_HtcPad = "";
-        public const string OpenVR_ValveIndex = "";
-        public const string OpenVR_OculusTouch_L = "OpenVR Controller(Oculus Rift S (Left Controller)) - Left";
-        public const string OpenVR_OculusTouch_R = "OpenVR Controller(Oculus Rift S (Right Controller)) - Right";
-        public const string Oculus_OculusTouch_L = "Oculus Touch Controller - Left";
-        public const string Oculus_OculusTouch_R = "Oculus Touch Controller - Right";
+        private static string PATH = "Assets/Resources/HardwaresPrefabsDefs.asset";
 
-        readonly static Dictionary<string, string> s_HandHardwares = new Dictionary<string, string>()
+        [MenuItem("NaveVR/Create Harewares Prefabs Defs Settings")]
+        static void CreateAsset()
         {
-            ["Knuckles"] = "VRHandles/index",
-            ["Vive Controller"] = "VRHandles/htc",
-            ["Vive. Controller"] = "VRHandles/htc",
-            ["Oculus Quest"] = "VRHandles/oculus_rifts",
-            ["Oculus Rift"] = "VRHandles/oculus_rifts",
-            ["CV1"] = "VRHandles/oculus_cv1",
-            ["WindowsMR"] = "VRHandles/wmr",
-        };
-
-        public static Hardware Show(HardwareListener listener)
-        {
-            var meta = NaveVR.GetMetaDara(listener.NodeType);
-
-
-            return null;
+            AssetDatabase.CreateAsset(new Hardwares(),PATH);
         }
+#endif
 
-        public static void Hide(Hardware hardware)
+        ////头盔
+        //public const string Hmd_HTCVive = "";
+        //public const string Hmd_HTCCosmas = "";
+        //public const string Hmd_OculusRiftS = "";
+        //public const string Hmd_OculusQuest = "";
+        //public const string Hmd_ValveIndex = "";
+
+        ////手柄
+        //public const string OpenVR_HtcPad = "";
+        //public const string OpenVR_ValveIndex = "";
+        //public const string OpenVR_OculusTouch_L = "OpenVR Controller(Oculus Rift S (Left Controller)) - Left";
+        //public const string OpenVR_OculusTouch_R = "OpenVR Controller(Oculus Rift S (Right Controller)) - Right";
+        //public const string Oculus_OculusTouch_L = "Oculus Touch Controller - Left";
+        //public const string Oculus_OculusTouch_R = "Oculus Touch Controller - Right";
+
+        //readonly static Dictionary<string, string> s_HandHardwares = new Dictionary<string, string>()
+        //{
+        //    ["Knuckles"] = "VRHandles/index",
+        //    ["Vive Controller"] = "VRHandles/htc",
+        //    ["Vive. Controller"] = "VRHandles/htc",
+        //    ["Oculus Quest"] = "VRHandles/oculus_rifts",
+        //    ["Oculus Rift"] = "VRHandles/oculus_rifts",
+        //    ["CV1"] = "VRHandles/oculus_cv1",
+        //    ["WindowsMR"] = "VRHandles/wmr",
+        //};
+
+        [SerializeField] Hardware[] hardwarePrefabs;
+
+        public Hardware CreateHardware(TrackingAnchor acnhor)
         {
-            
-        }
-
-        //追踪器
-        public const string OpenVR_HtcVive_Tracker = "VIVE Tracker";
-
-        static Dictionary<SupportXRHardware, string> s_SupportXRControlerRes = new Dictionary<SupportXRHardware, string>
-        {
-            [SupportXRHardware.Knuckles] = "Index",
-            [SupportXRHardware.HTCVive] = "HTC",
-            [SupportXRHardware.OculusRift] = "Oculus_rifts",
-            [SupportXRHardware.OculusCV1] = "Oculus_cv1",
-            [SupportXRHardware.WindowsMR] = "WMR",
-        };
-
-        static List<SupportXRControlerInfo> S_SupportXRControlerInfos;
-
-        static string S_DefaultHandRes = "OculusTouchForQuestAndRiftS";
-
-        /// <summary>
-        /// 注册需要支持的手柄设备：名称-资源映射
-        /// </summary>
-        public static void RegistHandHardwarePrebs(SupportXRControlerInfo[] configs)
-        {
-            S_SupportXRControlerInfos = new List<SupportXRControlerInfo>();
-            S_SupportXRControlerInfos.AddRange(configs);
-        }
-
-        public static string GetControllerHardwarePrebs(string name)
-        {
-            if(S_SupportXRControlerInfos != null) {
-                foreach (var info in S_SupportXRControlerInfos) {
-                    var readableNames = info.hardwardReadableNames;
-                    foreach (var readableName in readableNames)
-                    {
-                        if (name.Contains(readableName)) return info.assetBundleName;
-                    }
-                }
-            }
-            Debug.LogErrorFormat("警告！没有找到设备{0}的配置资源，默认为 OculusRift !", name);
-            return S_DefaultHandRes;
-        }
-
-        public static string GetControllerHardwarePrebs(SupportXRHardware hardware)
-        {
-            if(S_SupportXRControlerInfos != null){
-                foreach (var info in S_SupportXRControlerInfos){
-                    if (info.xRControler == hardware)
-                        return info.assetBundleName;
-                }
+            string deviceName = acnhor.name;
+            Hardware hardware = acnhor.hardware;
+            if (hardware != null) {
+                if (hardware.TryMathingName(deviceName)) return hardware;
+                else GameObject.Destroy(hardware);
             }
 
-            Debug.LogErrorFormat("警告！没有找到设备{0}的配置资源，默认为 OculusRift !", hardware);
-            return S_DefaultHandRes;
+            foreach (var prefab in hardwarePrefabs) {
+                if(prefab.TryMathingName(deviceName))
+                    return GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity, acnhor.transform);
+            }
+
+            Debug.LogError("ShowHardware() 没有找到匹配的设备！！！就默认使用第一个配置");
+            return GameObject.Instantiate(hardwarePrefabs[0], Vector3.zero, Quaternion.identity, acnhor.transform);
         }
 
-        public static void LoadControllerHardwardPrebsAsync(string name, Action<GameObject> onLoaded)
+        public void DestroyHardware(TrackingAnchor acnhor)
         {
-            bool left = name.Contains("left") || name.Contains("Left");
-            string prebs = GetControllerHardwarePrebs(name);
-            string prebs_path = left ? prebs + "_Left" : prebs + "_Right";
-            onLoaded?.Invoke(Resources.Load<GameObject>(prebs_path));
+            Hardware hardware = acnhor.hardware;
+            if (hardware != null)
+                GameObject.Destroy(hardware);
         }
     }
 }

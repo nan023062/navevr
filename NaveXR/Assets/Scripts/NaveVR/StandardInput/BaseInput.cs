@@ -153,6 +153,6 @@ namespace Nave.VR
             return GetDirectionAngle(Vector2.down, axis);
         }
 
-        internal abstract void UpdateState(Metadata xRNodeUsage);
+        internal abstract void UpdateState(TrackingAnchor xRNodeUsage);
     }
 }

@@ -13,31 +13,45 @@ namespace Nave.VR
 #endif
     }
 
-    public class CameraRig : MonoBehaviour
+    public class CameraRig : TrackingSpace
     {
-        [Header("数据处理器"), SerializeField]
-        private AbstractMetadataProcessor proc;
-
         [Header("VR运行环境"), SerializeField]
         private Evn evn = Evn.Oculusvr;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             switch (evn)
             {
                 case Evn.Oculusvr:
-                    NaveVR.InitEvn(typeof(UnityOculusvrEvn));
+                    NaveVR.InitEvn(typeof(TrackingEvnUnityOculusvr),this);
                     break;
 #if SUPPORT_STEAM_VR
                 case Evn.Steamvr:
-                    NaveVR.InitEvn(typeof(UnitySteamvrEvn));
+                    NaveVR.InitEvn(typeof(UnitySteamvrEvn),this);
                     break;
 #endif
                 default:
-                    NaveVR.InitEvn(typeof(UnityOpenvrEvn));
+                    NaveVR.InitEvn(typeof(TrackingEvnUnityOpenvr), this);
                     break;
             }
-            NaveVR.SetMetadataProcessor(proc);
         }
+
+        protected override void OnPostProcessTrackingAnchors()
+        {
+
+        }
+
+        protected override void OnPreProcessTrackingAnchors()
+        {
+    
+        }
+
+        protected override void OnProcessTrackingAnchors()
+        {
+ 
+        }
+
     }
 }

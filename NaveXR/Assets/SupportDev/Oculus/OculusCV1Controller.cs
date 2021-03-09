@@ -9,10 +9,18 @@ namespace Nave.VR
     [XRHardware()]
     public class OculusCV1Controller : Controller
     {
+        protected override void OnDeviceConnected()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OnDeviceDisConnected()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void OnUpdate()
         {
-            base.OnUpdate();
-
 
         }
 

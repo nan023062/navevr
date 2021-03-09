@@ -3,27 +3,25 @@
 namespace Nave.VR
 {
     [RequireComponent(typeof(Animator))]
-    public class Controller : Hardware
+    public abstract class Controller : Hardware
     {
-        public bool isLeft = true;
+        [Header("左控制器"), SerializeField] GameObject m_LeftCtrl;
 
-        [Header("射线"),SerializeField] LaserPointer m_Laser;
+        [Header("右控制器"), SerializeField] GameObject m_RightCtrl;
 
         private Animator m_Animator;
+        public bool isLeft => NodeType == NodeType.LeftHand;
 
-        public void Awake()
+        public GameObject Ctrl => isLeft ? m_LeftCtrl : m_RightCtrl;
+
+        public virtual void Awake()
         {
-            m_Laser.inputType = isLeft ? LaserPointer.InputType.LeftHand : LaserPointer.InputType.RightHand;
-            m_Laser.SetVisiable(m_LaserShow);
             m_Animator = GetComponent<Animator>();
         }
 
-        protected override void OnUpdate()
-        {
-            
-        }
-
         #region Laser
+
+        private LaserPointer m_Laser;
 
         private bool m_LaserShow = false;
         public bool LaserShow { get { return m_LaserShow && m_Laser.isActiveAndEnabled; } }
@@ -32,6 +30,22 @@ namespace Nave.VR
                 m_LaserShow = visiable;
                 m_Laser?.SetVisiable(m_LaserShow && isActiveAndEnabled);
             }
+        }
+
+        public override void SetNodeType(NodeType nodeType)
+        {
+            base.SetNodeType(nodeType);
+
+            m_LeftCtrl.SetActive(isLeft);
+
+            m_RightCtrl.SetActive(!isLeft);
+
+            m_Laser = Ctrl.GetComponentInChildren<LaserPointer>();
+
+            m_Laser.inputType = isLeft ? LaserPointer.InputType.LeftHand : LaserPointer.InputType.RightHand;
+
+            m_Laser.SetVisiable(m_LaserShow);
+
         }
 
         #endregion

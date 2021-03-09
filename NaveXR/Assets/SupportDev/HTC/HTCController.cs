@@ -11,11 +11,18 @@ namespace Nave.VR
     /// </summary>
     public class HTCController : Controller
     {
+        protected override void OnDeviceConnected()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OnDeviceDisConnected()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void OnUpdate()
         {
-            base.OnUpdate();
-
-
         }
     }
 }

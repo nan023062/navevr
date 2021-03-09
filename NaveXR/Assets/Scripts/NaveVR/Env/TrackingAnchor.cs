@@ -33,21 +33,30 @@ namespace Nave.VR
     /// <summary>
     /// 原始数据
     /// </summary>
-    internal class Metadata
+    [System.Serializable]
+    public class TrackingAnchor
     {
         public readonly NodeType type = 0;
 
-        private ulong m_UniqueId = 0;
+        [SerializeField] ulong m_UniqueId = 0;
 
-        private string m_Name = string.Empty;
+        [SerializeField] string m_Name = string.Empty;
+
+        public Vector3 position = Vector3.zero;
+
+        public Quaternion rotation = Quaternion.identity;
+
+        internal Transform transform { set; get; }
+
+        public Hardware hardware { protected set; get; }
 
         public ulong uniqueID { get { return m_UniqueId; } }
 
         public string name { get { return m_Name; } }
 
-        public bool isValid { get { return m_UniqueId > 0; } }
+        public bool connected { get { return m_UniqueId > 0; } }
 
-        internal Metadata(NodeType type)
+        public TrackingAnchor(NodeType type)
         {
             this.type = type;
         }
@@ -64,21 +73,32 @@ namespace Nave.VR
             m_Name = string.Empty;
         }
 
-        public Pose GetPose() { return new Pose() { position= position, rotation = rotation }; }
+        public Pose GetPose() 
+        { 
+            return new Pose() { position= position, rotation = rotation }; 
+        }
 
-        public void SetPose(Pose pose) { position = pose.position; rotation = pose.rotation; }
+        public void SetPose(Pose pose) 
+        { 
+            position = pose.position; rotation = pose.rotation; 
+        }
 
-        public Vector3 position;
-
-        public Quaternion rotation;
+        internal void ApplyPoseToTransform()
+        {
+            if(transform != null) {
+                transform.localPosition = position;
+                transform.localRotation = rotation;
+            }
+        }
     }
 
     /// <summary>
     /// 头盔数据
     /// </summary>
-    internal class HeadMetadata : Metadata
+    [System.Serializable]
+    public class HeadAnchor : TrackingAnchor
     {
-        internal HeadMetadata() :base(NodeType.Head)
+        internal HeadAnchor() :base(NodeType.Head)
         {
             //眼睛数据 eyeData
         }
@@ -88,11 +108,11 @@ namespace Nave.VR
     /// 手柄数据
     /// </summary>
     [System.Serializable]
-    internal class HandMetadata : Metadata
+    public class HandAnchor : TrackingAnchor
     {
         public static readonly int fingerBoneNum = 31;
 
-        internal HandMetadata(NodeType type) : base(type)
+        public HandAnchor(NodeType type) : base(type)
         {
             //手势数据 valve index
         }
@@ -101,11 +121,14 @@ namespace Nave.VR
         {
             base.Connected(uniquedId, name);
             isPad = name.Contains("Vive") || name.ToLower().Contains("wmr");
+            hardware = NaveVR.trackingSpace?.hardwarePrefabsDefs.CreateHardware(this);
         }
 
         internal override void Disconnect()
         {
             base.Disconnect();
+            NaveVR.trackingSpace?.hardwarePrefabsDefs.DestroyHardware(this);
+            hardware = null;
             isPad = false;
         }
 
@@ -146,5 +169,22 @@ namespace Nave.VR
         //hand pose
         public bool handPoseChanged = false;
         public float[] fingerCurls = new float[] { 0, 0, 0, 0, 0 };
+    }
+
+
+    [System.Serializable]
+    public class LeftHandAnchor : HandAnchor
+    {
+        public LeftHandAnchor() : base(NodeType.LeftHand)
+        {
+        }
+    }
+
+    [System.Serializable]
+    public class RightHandAnchor : HandAnchor
+    {
+        public RightHandAnchor() : base(NodeType.RightHand)
+        {
+        }
     }
 }

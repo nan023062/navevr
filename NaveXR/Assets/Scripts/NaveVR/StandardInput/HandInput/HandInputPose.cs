@@ -27,9 +27,9 @@ namespace Nave.VR
             this.isLeft = isLeft;
         }
 
-        internal override void UpdateState(Metadata input)
+        internal override void UpdateState(TrackingAnchor input)
         {
-            HandMetadata hand = input as HandMetadata;
+            HandAnchor hand = input as HandAnchor;
             poseChanged = hand.handPoseChanged;
             if(poseChanged) Array.Copy(hand.fingerCurls, handPose_Value, handPose_Value.Length);
         }
