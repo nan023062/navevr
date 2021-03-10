@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Nave.VR
 {
     [XRHardware()]
-    public class WMRController : Controller
+    public class ValveIndexController : Controller
     {
         protected override void OnUpdate()
         {
@@ -18,12 +18,16 @@ namespace Nave.VR
             m_Animator.SetFloat("Grip", InputDevices.GetKeyForce(isLeft ? 0 : 1, InputKey.Grip));
             m_Animator.SetFloat("Trigger", InputDevices.GetKeyForce(isLeft ? 0 : 1, InputKey.Trigger));
         }
+
         protected override void OnDeviceConnected()
         {
+
         }
 
         protected override void OnDeviceDisconnected()
         {
+
         }
+
     }
 }

@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Nave.VR
 {
@@ -11,6 +14,23 @@ namespace Nave.VR
     /// </summary>
     public class XRGraphicRaycaster : GraphicRaycaster
     {
+        #region UNITY_EDITOR
+
+        [MenuItem("NaveVR/Compoment/XRGraphicRaycaster")]
+        private static void AddToUGUI()
+        {
+            if (Selection.activeObject) {
+                var ugui = Selection.activeObject as GameObject;
+                var graphic = ugui.GetComponent<GraphicRaycaster>();
+                if(!(graphic is XRGraphicRaycaster)) {
+                    GameObject.DestroyImmediate(graphic);
+                    ugui.AddComponent<XRGraphicRaycaster>();
+                }
+            }
+        }
+
+        #endregion
+
         private Canvas mCanvas;
 
         private Canvas UICanvas

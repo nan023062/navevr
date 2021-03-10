@@ -27,7 +27,7 @@ namespace Nave.VR
 
         public override bool IsModuleSupported()
         {
-            return NaveVR.isEnabled || base.IsModuleSupported();
+            return InputDevices.isEnabled || base.IsModuleSupported();
         }
 
         private bool ShouldIgnoreEventsOnNoFocus()
@@ -49,7 +49,7 @@ namespace Nave.VR
 
         public override void Process()
         {
-            if ((!NaveVR.isFocus && !eventSystem.isFocused) && ShouldIgnoreEventsOnNoFocus()) return;
+            if ((!InputDevices.isFocus && !eventSystem.isFocused) && ShouldIgnoreEventsOnNoFocus()) return;
 
             bool usedEvent = SendUpdateEventToSelectedObject();
 
@@ -135,7 +135,7 @@ namespace Nave.VR
         {
             bool result = false;
 
-            var fingers = NaveVR.GetFingers();
+            var fingers = XREventSystem.GetFingers();
             int length = fingers.Count;
             for (int i = 0; !result && i < length; i++)
             {
@@ -176,7 +176,6 @@ namespace Nave.VR
             pointerData.button = PointerEventData.InputButton.Left;
             pointerData.raycastCamera = finger.raycastCamera;
             pointerData.position = new Vector2(finger.raycastCamera.pixelWidth * 0.5f, finger.raycastCamera.pixelHeight * 0.5f);
-            pointerData.gunType = -1;
 
             pointerData.useFingerRaycast = true;
             eventSystem.RaycastAll(pointerData, m_RaycastResultCache);
@@ -228,7 +227,7 @@ namespace Nave.VR
         {
             bool result = false;
 
-            var lasers = NaveVR.GetLasers();
+            var lasers = XREventSystem.GetLasers();
             int length = lasers.Count;
             for (int i = 0; i < length; i++)
             {
@@ -273,7 +272,6 @@ namespace Nave.VR
             pointerData.button = PointerEventData.InputButton.Left;
             pointerData.raycastCamera = laser.raycastCamera;
             pointerData.position = new Vector2(laser.raycastCamera.pixelWidth * 0.5f, laser.raycastCamera.pixelHeight * 0.5f);
-            pointerData.gunType = (int)laser.inputType;
 
             pointerData.useFingerRaycast = false;
             eventSystem.RaycastAll(pointerData, m_RaycastResultCache);

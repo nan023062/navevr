@@ -58,12 +58,12 @@ namespace Nave.VR
         protected override void OnEnable()
         {
             base.OnEnable();
-            NaveVR.Regist(this);
+            XREventSystem.Regist(this);
         }
 
         protected override void OnDisable()
         {
-            NaveVR.Remove(this);
+            XREventSystem.Remove(this);
             base.OnDisable();
         }
 
@@ -75,13 +75,13 @@ namespace Nave.VR
 
                 //左手按鍵狀態
                 if (inputType == InputType.LeftHand) {
-                    Vector2 aixs = NaveVR.GetTouchAxis(0);
+                    Vector2 aixs = InputDevices.GetTouchAxis(0);
                     if (aixs.sqrMagnitude > scrollThrelod)
                         scrollDelta = aixs * handScrollSensitivity;
                 }
                 //右手按鍵狀態
                 else if (inputType == InputType.RightHand) {
-                    Vector2 aixs = NaveVR.GetTouchAxis(1);
+                    Vector2 aixs = InputDevices.GetTouchAxis(1);
                     if (aixs.sqrMagnitude > scrollThrelod)
                         scrollDelta = aixs * handScrollSensitivity;
                 }
@@ -113,14 +113,14 @@ namespace Nave.VR
             //左手按鍵狀態
             if (inputType == InputType.LeftHand)
             {
-                isPressed = NaveVR.IsLeftKeyDown(KeyCode.Trigger);
-                isReleased = NaveVR.IsLeftKeyUp(KeyCode.Trigger);
+                isPressed = InputDevices.IsLeftKeyDown(InputKey.Trigger);
+                isReleased = InputDevices.IsLeftKeyUp(InputKey.Trigger);
             }
             //右手按鍵狀態
             else if (inputType == InputType.RightHand)
             {
-                isPressed = NaveVR.IsRightKeyDown(KeyCode.Trigger);
-                isReleased = NaveVR.IsRightKeyUp(KeyCode.Trigger);
+                isPressed = InputDevices.IsRightKeyDown(InputKey.Trigger);
+                isReleased = InputDevices.IsRightKeyUp(InputKey.Trigger);
             }
             //Unity原生模式狀態
             else if (inputType == InputType.Mouse)

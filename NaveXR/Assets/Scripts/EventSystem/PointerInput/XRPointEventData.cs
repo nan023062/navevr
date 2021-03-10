@@ -26,8 +26,6 @@ namespace Nave.VR
 
         public Camera raycastCamera;
 
-        public int gunType = 1;
-
         public Vector3 pressHitPosition;
 
         public static FramePressState StateForButton(bool pressed, bool released)

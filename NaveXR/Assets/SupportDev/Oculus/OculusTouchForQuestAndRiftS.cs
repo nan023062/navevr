@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace Nave.VR
 {
-    [XRHardware()]
-    public class WMRController : Controller
+    public class OculusTouchForQuestAndRiftS : Controller
     {
+        protected override void OnDeviceConnected()
+        {
+
+        }
+
+        protected override void OnDeviceDisconnected()
+        {
+
+        }
+
         protected override void OnUpdate()
         {
             m_Animator.SetFloat("Button 1", InputDevices.GetKeyForce(isLeft ? 0 : 1, InputKey.Primary));
@@ -18,12 +27,6 @@ namespace Nave.VR
             m_Animator.SetFloat("Grip", InputDevices.GetKeyForce(isLeft ? 0 : 1, InputKey.Grip));
             m_Animator.SetFloat("Trigger", InputDevices.GetKeyForce(isLeft ? 0 : 1, InputKey.Trigger));
         }
-        protected override void OnDeviceConnected()
-        {
-        }
 
-        protected override void OnDeviceDisconnected()
-        {
-        }
     }
 }

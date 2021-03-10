@@ -12,7 +12,7 @@ namespace Nave.VR
     {
         protected override IEnumerator InitEvnAsync(Action<string> onResult)
         {
-            NaveVR.GetInstance().gameObject.AddComponent<OVRManager>();
+            InputDevices.GetInstance().gameObject.AddComponent<OVRManager>();
             float duration = 5f;
             while (duration > 0f) {
                 if (OVRManager.OVRManagerinitialized) {
