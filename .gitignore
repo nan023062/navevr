@@ -1,7 +1,7 @@
-NaveXR/Library/
-NaveXR/UnityPackageManager/
-NaveXR/Temp/
-NaveXR/obj/
+Library/
+UnityPackageManager/
+Temp/
+obj/
 obj.meta
 *.log
 *.sln
