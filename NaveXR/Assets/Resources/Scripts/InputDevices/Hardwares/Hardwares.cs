@@ -9,25 +9,13 @@ using UnityEditor;
 
 namespace Nave.VR
 {
-    internal class Hardwares : ScriptableObject
+    [Serializable]
+    internal class Hardwares : MonoBehaviour
     {
 #if UNITY_EDITOR
-        private static string PATH = "Assets/Resources/HardwaresPrefabsDefs.asset";
-
-        [MenuItem("NaveVR/Settings/Harewares Defs")]
-        public static Hardwares CreateAsset()
-        {
-            var asset = AssetDatabase.LoadAssetAtPath<Hardwares>(PATH);
-            if(asset == null) {
-                asset = CreateInstance<Hardwares>();
-                AssetDatabase.CreateAsset(asset, PATH);
-            }
-            return asset;
-        }
-
         [HideInInspector] public Hardware test;
 
-        [CustomEditor(typeof(Hardwares))]
+        //[CustomEditor(typeof(Hardwares))]
         class SelfEditor : Editor
         {
             private SerializedProperty m_HardwarePrefabs;
@@ -53,7 +41,7 @@ namespace Nave.VR
                             if(EditorGUILayout.Toggle(self.test == hardware, GUILayout.Width(20))) {
                                 self.test = hardware;
                             }
-                            EditorGUILayout.ObjectField(define);
+                            define.objectReferenceValue = EditorGUILayout.ObjectField(define.objectReferenceValue, typeof(Hardware));
                             if (GUILayout.Button("-", GUILayout.Width(20))) {
                                 var lst = self.hardwarePrefabs.ToList();
                                 lst.RemoveAt(i);
@@ -77,8 +65,8 @@ namespace Nave.VR
             }
         }
 #endif
-
-        [HideInInspector] public Hardware[] hardwarePrefabs;
+        [SerializeField]
+        public Hardware[] hardwarePrefabs;
 
         public Hardware CreateHardware(TrackingAnchor anchor)
         {

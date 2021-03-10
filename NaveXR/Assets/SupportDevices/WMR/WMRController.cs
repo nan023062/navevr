@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nave.VR
 {
-    [XRHardware()]
+    [System.Serializable]
     public class WMRController : Controller
     {
         protected override void OnDeviceConnected()

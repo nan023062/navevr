@@ -2,6 +2,7 @@
 
 namespace Nave.VR
 {
+    [System.Serializable]
     public abstract class Controller : Hardware
     {
         [Header("Controller Defines")] 

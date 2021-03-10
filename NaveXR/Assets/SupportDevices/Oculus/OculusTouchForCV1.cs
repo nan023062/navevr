@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nave.VR
 {
+    [System.Serializable]
     public class OculusTouchForCV1 : Controller
     {
         protected override void OnDeviceConnected()

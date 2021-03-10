@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Nave.VR
 {
+    [System.Serializable]
     public abstract class Hardware : MonoBehaviour
     {
         #region List of matching names

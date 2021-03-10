@@ -53,17 +53,6 @@ namespace Nave.VR
             rightFootAnchor.transform = transform.Find(c_RightFootAnchor);
         }
 
-        [ExecuteInEditMode]
-        private void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (!hardwarePrefabsDefs)
-            {
-                hardwarePrefabsDefs = Hardwares.CreateAsset();
-            }
-#endif
-        }
-
         private void ApplyCurrentPoseToAnchors()
         {
             //将Pose数据应用到transform

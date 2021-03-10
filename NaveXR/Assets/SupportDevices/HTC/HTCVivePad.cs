@@ -6,9 +6,7 @@ using System.Linq;
 
 namespace Nave.VR
 {
-    /// <summary>
-    /// 虚拟控制器对象
-    /// </summary>
+    [System.Serializable]
     public class HTCVivePad : Controller
     {
         protected override void OnDeviceConnected()
