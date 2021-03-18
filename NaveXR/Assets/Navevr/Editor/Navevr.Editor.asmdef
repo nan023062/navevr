@@ -1,9 +1,11 @@
 {
-    "name": "NaveVR.Framework",
+    "name": "Navevr.Editor",
     "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+        "GUID:464a7558eb7125c4ea89cde5210b95c4"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

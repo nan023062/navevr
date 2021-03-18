@@ -1,0 +1,11 @@
+{
+  "name": "com.navevr",
+  "displayName": "Navevr",
+  "version": "0.0.1",
+  "unity": "2021.3",
+  "description": "basic framework for adapting VR devices.",
+  "keywords": [
+    "vr"
+  ],
+  "dependencies": {}
+}

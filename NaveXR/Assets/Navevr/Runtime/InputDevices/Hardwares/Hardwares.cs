@@ -15,7 +15,7 @@ namespace Nave.VR
 #if UNITY_EDITOR
         [HideInInspector] public Hardware test;
 
-        //[CustomEditor(typeof(Hardwares))]
+        [CustomEditor(typeof(Hardwares))]
         class SelfEditor : Editor
         {
             private SerializedProperty m_HardwarePrefabs;
@@ -65,7 +65,7 @@ namespace Nave.VR
             }
         }
 #endif
-        [SerializeField]
+        [SerializeField,HideInInspector]
         public Hardware[] hardwarePrefabs;
 
         public Hardware CreateHardware(TrackingAnchor anchor)
