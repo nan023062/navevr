@@ -1,0 +1,17 @@
+{
+    "name": "Navevr.Editor",
+    "references": [
+        "GUID:464a7558eb7125c4ea89cde5210b95c4"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
