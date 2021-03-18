@@ -9,5 +9,8 @@
   ],
   "dependencies": {},
   "repository": {
+    "type": "git",
+    "url": "https://gitee.com/ariboy/nave-xr/tree/master/NaveXR/Packages/nave.vr",
+    "revision": "c8f5044ffe6adb909f9836160b0bdaa30f2d1ec9"
   }
 }
